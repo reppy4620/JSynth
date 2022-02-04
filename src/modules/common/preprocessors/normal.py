@@ -67,7 +67,8 @@ class NormalPreProcessor(PreProcessorBase):
             else:
                 final_duration.append(duration_floor[i])
                 i += 1
-        print(sum(duration_floor), sum(final_duration))
+        print(duration_floor)
+        print(final_duration)
         assert len(phoneme.split()) == len(final_duration)
         return final_duration
 
