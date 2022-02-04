@@ -83,8 +83,8 @@ class NormalPreProcessor(PreProcessorBase):
 
         for i in tqdm(range(len(wav_paths))):
             wav = self.load_wav(wav_paths[i], label_paths[i])
-            wav = torch.FloatTensor(wav).view(1, -1)
             pitch, *_ = self.extract_feats(wav)
+            wav = torch.FloatTensor(wav).view(1, -1)
             mel, energy = self.to_mel(wav)
             mel, energy = mel.squeeze(), energy.squeeze()
             phoneme = self.load_phoneme(label_paths[i])
