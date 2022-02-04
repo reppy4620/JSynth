@@ -25,6 +25,7 @@ class ConformerDataset(Dataset):
             pitch,
             energy
         ) = torch.load(self.data[idx])
+        print(label)
         phoneme = self.tokenizer(label)
         return (
             mel.transpose(-1, -2),
