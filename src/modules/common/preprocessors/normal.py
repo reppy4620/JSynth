@@ -66,6 +66,8 @@ class NormalPreProcessor(PreProcessorBase):
                 final_duration.append(0)
             else:
                 final_duration.append(duration_floor[i])
+            i += 1
+        assert i == len(duration_floor)
         return final_duration
 
     def load_phoneme(self, label_path):
