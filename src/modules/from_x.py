@@ -1,18 +1,18 @@
 from omegaconf import OmegaConf
 
-from .cfm import ConformerModule, validate as ae_val
+from .conformer import ConformerModule, validate as ae_val
 from .common.preprocessors import NormalPreProcessor
 
 modules = {
-    'cfm': ConformerModule
+    'conformer': ConformerModule
 }
 
 val_fn = {
-    'cfm': ae_val
+    'conformer': ae_val
 }
 
 preprocessors = {
-    'cfm': NormalPreProcessor
+    'conformer': NormalPreProcessor
 }
 
 

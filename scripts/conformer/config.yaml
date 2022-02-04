@@ -1,4 +1,4 @@
-name: cfm
+name: conformer
 seed: 42
 output_dir: ./out
 

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from src.modules.common import ModelBase
+from ...common import ModelBase
 
 from .layers import EmbeddingLayer, RelPositionalEncoding, PostNet
 from .conformer import Conformer
