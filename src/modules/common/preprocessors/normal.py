@@ -10,7 +10,7 @@ from ttslearn.tacotron.frontend.openjtalk import pp_symbols
 from nnmnkwii.io import hts
 
 from .base import PreProcessorBase
-from ...transforms import MelSpectrogramWithEnergy
+from ..transforms import MelSpectrogramWithEnergy
 
 ORIG_SR = None
 NEW_SR = None
