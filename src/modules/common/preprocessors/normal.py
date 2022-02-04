@@ -88,6 +88,7 @@ class NormalPreProcessor(PreProcessorBase):
             wav = torch.FloatTensor(wav).view(1, -1)
             mel, energy = self.to_mel(wav)
             mel, energy = mel.squeeze(), energy.squeeze()
+            pitch = pitch[:mel.size(-1)]
             phoneme = self.load_phoneme(label_paths[i])
             duration = self.load_duration(label_paths[i])
             duration = self.refine_duration(duration, mel.size(-1))
