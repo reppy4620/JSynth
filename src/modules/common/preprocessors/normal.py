@@ -63,7 +63,8 @@ class NormalPreProcessor(PreProcessorBase):
         i = 0
         for p in phoneme.split():
             if p in extra_symbols:
-                final_duration.append(0)
+                if p != '_':
+                    final_duration.append(0)
             else:
                 final_duration.append(duration_floor[i])
                 i += 1
