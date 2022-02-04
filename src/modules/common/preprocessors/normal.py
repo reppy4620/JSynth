@@ -50,6 +50,7 @@ class NormalPreProcessor(PreProcessorBase):
 
     @staticmethod
     def refine_duration(duration, y_length):
+        duration = np.array(duration)
         duration_floor = np.floor(duration)
         diff_rest = y_length - np.sum(duration_floor)
         indices = np.argsort(np.abs(duration - duration_floor))
@@ -89,6 +90,7 @@ class NormalPreProcessor(PreProcessorBase):
             mel, energy = mel.squeeze(), energy.squeeze()
             phoneme = self.load_phoneme(label_paths[i])
             duration = self.load_duration(label_paths[i])
+            duration = self.refine_duration(duration, mel.size(-1))
 
             assert sum(duration) == mel.size(-1), f'{sum(duration)}, {mel.size(-1)}'
 
