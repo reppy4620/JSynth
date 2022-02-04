@@ -59,16 +59,7 @@ class NormalPreProcessor(PreProcessorBase):
             diff_rest -= 1
             if diff_rest == 0:
                 break
-        final_duration = list()
-        i = 0
-        for p in phoneme.split():
-            if p in extra_symbols:
-                final_duration.append(0)
-            else:
-                final_duration.append(duration_floor[i])
-                i += 1
-        assert len(phoneme.split()) == len(final_duration)
-        return final_duration
+        return duration_floor
 
     def load_phoneme(self, label_path):
         label = hts.load(label_path)
@@ -101,6 +92,7 @@ class NormalPreProcessor(PreProcessorBase):
             phoneme = self.load_phoneme(label_paths[i])
             duration = self.load_duration(label_paths[i])
             duration = self.refine_duration(phoneme, duration, mel.size(-1))
+            print(int(sum(duration)), mel.size(-1))
 
             assert sum(duration) == mel.size(-1), f'{sum(duration)}, {mel.size(-1)}'
 
