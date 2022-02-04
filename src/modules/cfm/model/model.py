@@ -1,0 +1,99 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from src.modules.common import ModelBase
+
+from .layers import EmbeddingLayer, RelPositionalEncoding, PostNet
+from .conformer import Conformer
+from .predictors import VarianceAdopter
+from .utils import sequence_mask, generate_path
+
+
+class ConformerModel(ModelBase):
+
+    def __init__(self, params):
+        super().__init__()
+
+        self.emb = EmbeddingLayer(**params.embedding, channels=params.encoder.channels)
+        self.relative_pos_emb = RelPositionalEncoding(
+            params.encoder.channels,
+            params.encoder.dropout
+        )
+        self.encoder = Conformer(**params.encoder)
+        self.variance_adopter = VarianceAdopter(**params.variance_adopter)
+        self.decoder = Conformer(**params.decoder)
+
+        self.out_conv = nn.Conv1d(params.decoder.channels, params.n_mel, 1)
+        self.post_net = PostNet(params.n_mel)
+
+    def forward(self, x, x_length):
+        x = self.emb(x)
+        x, pos_emb = self.relative_pos_emb(x)
+
+        x_mask = sequence_mask(x_length).unsqueeze(1).to(x.dtype)
+        x, pos_emb = self.relative_pos_emb(x)
+        x = self.encoder(x, pos_emb, x_mask)
+
+        x, y_mask = self.variance_adopter.infer(x, x_mask)
+        x, pos_emb = self.relative_pos_emb(x)
+        x = self.decoder(x, pos_emb, y_mask)
+        x = self.out_conv(x)
+        x_post = self.post_net(x)
+        x *= y_mask
+        x_post *= y_mask
+        x += x_post
+        return x
+
+    def compute_loss(self, batch):
+        (
+            x,
+            x_length,
+            y,
+            y_length,
+            duration,
+            pitch,
+            energy
+        ) = batch
+        x = self.emb(x)
+        x, pos_emb = self.relative_pos_emb(x)
+
+        x_mask = sequence_mask(x_length).unsqueeze(1).to(x.dtype)
+        y_mask = sequence_mask(y_length).unsqueeze(1).to(x.dtype)
+
+        x = self.encoder(x, pos_emb, x_mask)
+
+        attn_mask = torch.unsqueeze(x_mask, -1) * torch.unsqueeze(y_mask, 2)
+        path = generate_path(duration.squeeze(1), attn_mask.squeeze(1))
+
+        x, (dur_pred, pitch_pred, energy_pred) = self.variance_adopter(
+            x,
+            x_mask,
+            y_mask,
+            pitch,
+            energy,
+            path
+        )
+        x, pos_emb = self.relative_pos_emb(x)
+        x = self.decoder(x, pos_emb, y_mask)
+        x = self.out_conv(x)
+        x *= y_mask
+        x_post = self.post_net(x)
+        x_post *= y_mask
+        x += x_post
+
+        recon_loss = F.mse_loss(x, y)
+        recon_post_loss = F.mse_loss(x_post, y)
+        duration_loss = F.mse_loss(dur_pred, duration.to(x.dtype))
+        pitch_loss = F.mse_loss(pitch_pred, pitch.to(x.dtype))
+        energy_loss = F.mse_loss(energy_pred, energy.to(x.dtype))
+        loss = recon_loss + recon_post_loss + duration_loss + pitch_loss + energy_loss
+
+        return dict(
+            loss=loss,
+            recon=recon_loss,
+            recon_post=recon_post_loss,
+            duration=duration_loss,
+            pitch=pitch_loss,
+            energy=energy_loss
+        )

@@ -1,0 +1,47 @@
+name: cfm
+seed: 42
+output_dir: ./out
+
+preprocess:
+  wav_dir: /disk/fs1/Corpus/JSUT/jsut_ver1.1/basic5000/wav
+  label_dir: /disk/fs1/Corpus/JSUT/jsut-label/labels/basic5000
+  output_dir: ./dataset
+  orig_sr: 48000
+  new_sr: 24000
+
+train:
+  batch_size: 32
+  num_epochs: 1000
+  monitor: valid/recon_post_loss
+  save_interval: 100
+
+data:
+  data_dir: ./dataset
+  valid_size: 100
+
+model:
+  n_mel: 80
+
+  embedding:
+    n_phoneme: 52
+
+  encoder:
+    channels: 192
+    n_heads: 2
+    n_layers: 6
+    dropout: 0.1
+
+  variance_adopter:
+    in_channels: 192
+    channels: 256
+    dropout: 0.1
+
+  decoder:
+    channels: 192
+    n_heads: 2
+    n_layers: 6
+    kernel_size: 7
+    dropout: 0.1
+
+optimizer:
+  lr: 0.0003
