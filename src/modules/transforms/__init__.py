@@ -1,1 +1,1 @@
-from spectrogram import MelSpectrogram, Spectrogram
+from .spectrogram import MelSpectrogram, Spectrogram
