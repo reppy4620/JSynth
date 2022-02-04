@@ -98,7 +98,7 @@ class NormalPreProcessor(PreProcessorBase):
             pitch = pitch[:mel.size(-1)]
             phoneme = self.load_phoneme(label_paths[i])
             duration = self.load_duration(label_paths[i])
-            duration = self.refine_duration(duration, mel.size(-1))
+            duration = self.refine_duration(phoneme, duration, mel.size(-1))
 
             assert sum(duration) == mel.size(-1), f'{sum(duration)}, {mel.size(-1)}'
 
@@ -109,6 +109,15 @@ class NormalPreProcessor(PreProcessorBase):
             energy[energy != 0] = np.log(energy[energy != 0])
 
             assert pitch.shape[0] == mel.size(-1)
+            assert energy.shape[0] == mel.size(-1)
+
+            if i == 0:
+                print(wav.size())
+                print(mel.size())
+                print(phoneme)
+                print(duration)
+                print(pitch.shape)
+                print(energy.shape)
 
             torch.save([
                 wav,
