@@ -6,7 +6,7 @@ import pyworld as pw
 import soundfile as sf
 import torch
 from tqdm import tqdm
-from ttslearn.tacotron.frontend.openjtalk import pp_symbols
+from ttslearn.tacotron.frontend.openjtalk import pp_symbols, extra_symbols
 from nnmnkwii.io import hts
 
 from .base import PreProcessorBase
@@ -49,7 +49,7 @@ class NormalPreProcessor(PreProcessorBase):
         return wav
 
     @staticmethod
-    def refine_duration(duration, y_length):
+    def refine_duration(phoneme, duration, y_length):
         duration = np.array(duration)
         duration_floor = np.floor(duration)
         diff_rest = y_length - np.sum(duration_floor)
@@ -59,7 +59,14 @@ class NormalPreProcessor(PreProcessorBase):
             diff_rest -= 1
             if diff_rest == 0:
                 break
-        return duration_floor
+        final_duration = list()
+        i = 0
+        for p in phoneme.split():
+            if p in extra_symbols:
+                final_duration.append(0)
+            else:
+                final_duration.append(duration_floor[i])
+        return final_duration
 
     def load_phoneme(self, label_path):
         label = hts.load(label_path)
