@@ -25,10 +25,11 @@ class ConformerDataset(Dataset):
             pitch,
             energy
         ) = torch.load(self.data[idx])
-        phoneme, _ = self.tokenizer(label)
+        phoneme, is_extra = self.tokenizer(label)
         return (
             mel.transpose(-1, -2),
             phoneme,
+            is_extra[None, :].transpose(-1, -2),
             duration.transpose(-1, -2),
             pitch.transpose(-1, -2),
             energy.transpose(-1, -2)
@@ -39,6 +40,7 @@ def collate_fn(batch):
     (
         mel,
         phoneme,
+        is_extra,
         duration,
         pitch,
         energy
@@ -46,6 +48,7 @@ def collate_fn(batch):
 
     x_length = torch.LongTensor([len(x) for x in phoneme])
     phoneme = pad_sequence(phoneme, batch_first=True)
+    is_extra = pad_sequence(is_extra, batch_first=True)
 
     y_length = torch.LongTensor([x.size(0) for x in mel])
     mel = pad_sequence(mel, batch_first=True).transpose(-1, -2)
@@ -56,6 +59,7 @@ def collate_fn(batch):
 
     return (
         phoneme,
+        is_extra,
         x_length,
         mel,
         y_length,

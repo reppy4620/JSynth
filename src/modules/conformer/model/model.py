@@ -47,6 +47,7 @@ class ConformerModel(ModelBase):
     def compute_loss(self, batch):
         (
             x,
+            extra_mask,
             x_length,
             y,
             y_length,
@@ -73,6 +74,7 @@ class ConformerModel(ModelBase):
             energy,
             path
         )
+        dur_pred *= extra_mask
         x, pos_emb = self.relative_pos_emb(x)
         x = self.decoder(x, pos_emb, y_mask)
         x = self.out_conv(x)
