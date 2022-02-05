@@ -10,6 +10,7 @@ class TTSLearnTokenizer(TokenizerBase):
     def tokenize(self, text):
         inp = text_to_sequence(text.split())
         is_extra = [s in self.extra_symbol_set for s in text.split()]
+        print(inp)
         return torch.LongTensor(inp), torch.LongTensor(is_extra)
 
     def __len__(self):
