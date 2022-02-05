@@ -26,6 +26,8 @@ class ConformerDataset(Dataset):
             energy
         ) = torch.load(self.data[idx])
         phoneme, is_extra = self.tokenizer(label)
+        non_zero_idx = duration != 0
+        duration[non_zero_idx] = torch.log(duration[non_zero_idx])
         return (
             mel.transpose(-1, -2),
             phoneme,
