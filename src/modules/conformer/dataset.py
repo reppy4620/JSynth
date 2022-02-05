@@ -29,7 +29,7 @@ class ConformerDataset(Dataset):
         return (
             mel.transpose(-1, -2),
             phoneme,
-            is_extra[None, :].transpose(-1, -2),
+            is_extra.view(-1, 1),
             duration.transpose(-1, -2),
             pitch.transpose(-1, -2),
             energy.transpose(-1, -2)
@@ -48,7 +48,7 @@ def collate_fn(batch):
 
     x_length = torch.LongTensor([len(x) for x in phoneme])
     phoneme = pad_sequence(phoneme, batch_first=True)
-    is_extra = pad_sequence(is_extra, batch_first=True)
+    is_extra = pad_sequence(is_extra, batch_first=True).transpose(-1, -2)
 
     y_length = torch.LongTensor([x.size(0) for x in mel])
     mel = pad_sequence(mel, batch_first=True).transpose(-1, -2)
