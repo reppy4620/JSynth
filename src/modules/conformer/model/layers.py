@@ -112,6 +112,10 @@ class PostNet(nn.Module):
             nn.Dropout(0.5),
             nn.Conv1d(hidden_channels, in_channels, kernel_size, padding=kernel_size // 2)
         )
+    def forward(self, x, x_mask):
+        x = self.layers(x)
+        x *= x_mask
+        return x
 
 
 class RelPositionalEncoding(nn.Module):
