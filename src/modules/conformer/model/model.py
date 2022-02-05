@@ -77,7 +77,7 @@ class ConformerModel(ModelBase):
         x = self.decoder(x, pos_emb, y_mask)
         x = self.out_conv(x)
         x *= y_mask
-        x_post = self.post_net(x, x_mask)
+        x_post = self.post_net(x, y_mask)
         x += x_post
 
         recon_loss = F.mse_loss(x, y)
