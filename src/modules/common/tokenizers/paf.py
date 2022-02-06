@@ -30,7 +30,8 @@ class PAFTokenizer(TokenizerBase):
         d['xx'] = len(d) + 1
         return d
 
-    def tokenize(self, p, a, f):
+    def tokenize(self, inputs):
+        p, a, f = inputs
         p_id = [self.p_dict[s] for s in p]
         a_id = [self.a_dict[s] for s in a]
         f_id = [self.f_dict[s] for s in f]
