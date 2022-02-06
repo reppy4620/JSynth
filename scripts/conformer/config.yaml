@@ -31,6 +31,7 @@ model:
     mode: pp_add
     n_phoneme: 45
     n_prosody: 8
+    channels: 192
 
   encoder:
     channels: 192
