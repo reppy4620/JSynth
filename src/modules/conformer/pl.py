@@ -52,12 +52,6 @@ class ConformerModule(LightningModule):
                 pitch,
                 energy
             ) = batch
-            print(x_length)
-            print(y.size())
-            print(y_length)
-            print(duration.size())
-            print(pitch.size())
-            print(energy.size())
             o = self.model([*labels, x_length])
             print(o.size())
             plt.figure(figsize=(8, 6))

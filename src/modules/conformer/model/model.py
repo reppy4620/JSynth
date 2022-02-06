@@ -29,7 +29,6 @@ class ConformerModel(ModelBase):
     def forward(self, inputs):
         *labels, x_length = inputs
         x = self.emb(*labels)
-        print(x.size())
         x, pos_emb = self.relative_pos_emb(x)
 
         x_mask = sequence_mask(x_length).unsqueeze(1).to(x.dtype)
