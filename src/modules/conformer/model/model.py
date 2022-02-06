@@ -77,21 +77,17 @@ class ConformerModel(ModelBase):
         x, pos_emb = self.relative_pos_emb(x)
         x = self.decoder(x, pos_emb, y_mask)
         x = self.out_conv(x)
-        x_post = self.post_net(x, y_mask)
-        x = x + x_post
         x *= y_mask
 
         recon_loss = F.mse_loss(x, y)
-        recon_post_loss = F.mse_loss(x_post, y)
         duration_loss = F.mse_loss(dur_pred, duration.to(x.dtype))
         pitch_loss = F.mse_loss(pitch_pred, pitch.to(x.dtype))
         energy_loss = F.mse_loss(energy_pred, energy.to(x.dtype))
-        loss = recon_loss + recon_post_loss + duration_loss + pitch_loss + energy_loss
+        loss = recon_loss + duration_loss + pitch_loss + energy_loss
 
         return dict(
             loss=loss,
             recon=recon_loss,
-            recon_post=recon_post_loss,
             duration=duration_loss,
             pitch=pitch_loss,
             energy=energy_loss

@@ -15,7 +15,7 @@ preprocess:
 train:
   batch_size: 16
   num_epochs: 1000
-  monitor: valid/recon_post
+  monitor: valid/recon
   save_interval: 100
 
 data:
