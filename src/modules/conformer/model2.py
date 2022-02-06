@@ -12,7 +12,7 @@ class TTSModel(nn.Module):
     def __init__(self, params):
         super(TTSModel, self).__init__()
 
-        self.emb = EmbeddingLayer(**params.embedding, channels=params.encoder.channels // 3)
+        self.emb = EmbeddingLayer(**params.embedding)
         self.encoder = Transformer(**params.encoder)
         self.variance_adopter = VarianceAdopter(**params.variance_adopter)
         self.decoder = Conformer(**params.decoder)
