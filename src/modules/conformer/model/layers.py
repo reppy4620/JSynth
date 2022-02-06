@@ -37,6 +37,7 @@ class PAFEmbeddingLayer(nn.Module):
         p = self.p_emb(p) * self.scale
         a = self.a_emb(a) * self.scale
         f = self.f_emb(f) * self.scale
+        print(p.size(), a.size(), f.size())
         x = torch.cat([p, a, f], dim=-1).transpose(-1, -2)
         return x
 
