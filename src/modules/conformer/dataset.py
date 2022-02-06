@@ -57,6 +57,7 @@ def collate_fn(batch):
         if is_transpose[i]:
             x = x.transpose(-1, -2)
         inp_list.append(x)
+    print(inp_list[0].size())
 
     y_length = torch.LongTensor([x.size(0) for x in mel])
     mel = pad_sequence(mel, batch_first=True).transpose(-1, -2)
