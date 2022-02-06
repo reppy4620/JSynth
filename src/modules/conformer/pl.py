@@ -44,7 +44,7 @@ class ConformerModule(LightningModule):
     def configure_optimizers(self):
         opt = optim.AdamW(self.model.parameters(), **self.params.optimizer)
         scheduler = Scheduler.from_config(opt, self.params.scheduler, self.trainer.current_epoch-1)
-        return opt, scheduler
+        return [opt], [scheduler]
 
     def setup(self, stage=None):
         self.ds = ConformerDataset(self.params.data)
