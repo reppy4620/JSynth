@@ -53,7 +53,7 @@ model:
     dropout: 0.1
 
 optimizer:
-  lr: 0.0003
+  lr: 1.0
 
 scheduler:
   mode: noam
