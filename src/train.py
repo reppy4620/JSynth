@@ -53,6 +53,7 @@ def main():
         log_every_n_steps=10,
         resume_from_checkpoint=last_ckpt_path if last_ckpt_path.exists() else None
     )
+    module.trainer = trainer
     trainer.fit(module)
 
 
