@@ -8,7 +8,7 @@ preprocess:
     mode: pp_add
   wav_dir: /disk/fs1/Corpus/JSUT/jsut_ver1.1/basic5000/wav
   label_dir: /disk/fs1/Corpus/JSUT/jsut-label/labels/basic5000
-  output_dir: ./dataset_pp_add
+  output_dir: ../../dataset/pp_add
   orig_sr: 48000
   new_sr: 24000
 
@@ -19,7 +19,7 @@ train:
   save_interval: 100
 
 data:
-  data_dir: ./dataset_pp_add
+  data_dir: ../../dataset/pp_add
   valid_size: 100
   tokenizer:
     mode: pp_add
