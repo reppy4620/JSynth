@@ -10,8 +10,8 @@ class TTSLearnTokenizer(TokenizerBase):
         self.extra_symbol_set = set(extra_symbols)
 
     def tokenize(self, text):
-        inp = text_to_sequence(text.split())
-        is_extra = [s in self.extra_symbol_set for s in text.split()]
+        inp = text_to_sequence(text)
+        is_extra = [s in self.extra_symbol_set for s in text]
         return torch.LongTensor(inp), torch.FloatTensor(is_extra)
 
     def __len__(self):
@@ -19,16 +19,16 @@ class TTSLearnTokenizer(TokenizerBase):
 
     def extract(self, label_path, sr, y_length):
         label = hts.load(label_path)
-        phoneme = ' '.join(pp_symbols(label.contexts))
+        phoneme = pp_symbols(label.contexts)
 
         duration = self.extract_duration(label, sr, y_length)
         final_duration = list()
         i = 0
-        for p in phoneme.split():
+        for p in phoneme:
             if p != '_' and p in extra_symbols:
                 final_duration.append(0)
             else:
                 final_duration.append(duration[i])
                 i += 1
-        assert len(phoneme.split()) == len(final_duration)
+        assert len(phoneme) == len(final_duration)
         return phoneme, final_duration
