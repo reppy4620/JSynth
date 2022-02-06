@@ -48,10 +48,8 @@ def collate_fn(batch):
         pitch,
         energy
     ) = tuple(zip(*batch))
-    print(is_transpose)
 
     x_length = torch.LongTensor([len(x) for x in inputs[0]])
-
     inp_list = list()
     for i, inp in enumerate(inputs):
         x = pad_sequence(inp, batch_first=True)
