@@ -38,7 +38,6 @@ class ConformerModule(LightningModule):
             loss_dict,
             on_step=False,
             on_epoch=True,
-            prog_bar=True,
             logger=True
         )
 
