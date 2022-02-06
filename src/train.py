@@ -34,12 +34,14 @@ def main():
 
     csv_logger = CSVLogger(
         save_dir=f'{config.output_dir}',
-        name=f'logs',
-        flush_logs_every_n_steps=100000
+        name=f'csv_logs',
+        flush_logs_every_n_steps=100000,
+        version='first'
     )
     tb_logger = TensorBoardLogger(
         save_dir=f'{config.output_dir}',
-        name=f'logs'
+        name=f'tb_logs',
+        version='first'
     )
 
     last_ckpt_path = output_dir / 'last.ckpt'
