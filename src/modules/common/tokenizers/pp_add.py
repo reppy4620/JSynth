@@ -84,7 +84,7 @@ class PPAddTokenizer(TokenizerBase):
             # ピッチの立ち上がり
             elif a2 == 1 and a2_next == 2:
                 prosody.append("[")
-            elif flag:
+            elif not flag:
                 prosody.append('_')
 
         return phoneme, prosody
