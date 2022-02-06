@@ -18,7 +18,7 @@ class PPAddTokenizer(TokenizerBase):
         phoneme = [self.phoneme_dict[s] for s in phoneme]
         prosody = [self.prosody_dict[s] for s in prosody]
         is_transpose = [0, 0]
-        return torch.LongTensor(phoneme), torch.FloatTensor(prosody), is_transpose
+        return torch.LongTensor(phoneme), torch.LongTensor(prosody), is_transpose
 
     def __len__(self):
         return num_vocab()
