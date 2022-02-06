@@ -26,10 +26,11 @@ class PPAddTokenizer(TokenizerBase):
         label = hts.load(label_path)
         pp = pp_symbols(label.contexts)
         phoneme, prosody = list(), list()
-        for p in pp:
+        for i, p in enumerate(pp):
             if p in phonemes:
                 phoneme.append(p)
-                prosody.append('_')
+                if i != 0 or i != len(pp) - 1:
+                    prosody.append('_')
             elif p in extra_symbols:
                 if p == '_':
                     phoneme.append('pau')
