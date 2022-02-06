@@ -14,7 +14,7 @@ preprocess:
   new_sr: 24000
 
 train:
-  batch_size: 32
+  batch_size: 16
   num_epochs: 1000
   monitor: valid/recon
   save_interval: 100
