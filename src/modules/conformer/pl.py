@@ -41,6 +41,9 @@ class ConformerModule(LightningModule):
             logger=True
         )
 
+        if batch_idx == 0:
+            o = self.model(batch)
+
     def configure_optimizers(self):
         opt = optim.AdamW(self.model.parameters(), **self.params.optimizer)
         scheduler = Scheduler.from_config(opt, self.params.scheduler, self.trainer.current_epoch-1)

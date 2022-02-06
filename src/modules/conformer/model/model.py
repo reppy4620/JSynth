@@ -25,7 +25,6 @@ class ConformerModel(ModelBase):
         self.decoder = Conformer(**params.decoder)
 
         self.out_conv = nn.Conv1d(params.decoder.channels, params.n_mel, 1)
-        self.post_net = PostNet(params.n_mel)
 
     def forward(self, inputs):
         *labels, x_length = inputs
@@ -40,8 +39,6 @@ class ConformerModel(ModelBase):
         x, pos_emb = self.relative_pos_emb(x)
         x = self.decoder(x, pos_emb, y_mask)
         x = self.out_conv(x)
-        x_post = self.post_net(x, y_mask)
-        x += x_post
         x *= y_mask
         return x
 
