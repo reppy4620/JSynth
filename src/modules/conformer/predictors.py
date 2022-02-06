@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from .common import LayerNorm
-from .utils import sequence_mask, generate_path
+from .model.utils import sequence_mask, generate_path
 
 
 class VarianceAdopter(nn.Module):
