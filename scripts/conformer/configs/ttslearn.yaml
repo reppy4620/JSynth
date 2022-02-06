@@ -1,0 +1,61 @@
+name: conformer
+seed: 42
+output_dir: ./out
+
+preprocess:
+  mode: normal
+  tokenizer:
+    mode: ttslearn
+  wav_dir: /disk/fs1/Corpus/JSUT/jsut_ver1.1/basic5000/wav
+  label_dir: /disk/fs1/Corpus/JSUT/jsut-label/labels/basic5000
+  output_dir: ../../dataset/ttslearn
+  orig_sr: 48000
+  new_sr: 24000
+
+train:
+  batch_size: 16
+  num_epochs: 1000
+  monitor: valid/recon
+  save_interval: 100
+
+data:
+  data_dir: ../../dataset/ttslearn
+  valid_size: 100
+  tokenizer:
+    mode: ttslearn
+
+model:
+  n_mel: 80
+
+  embedding:
+    mode: ttslearn
+    n_phoneme: 45
+    n_prosody: 8
+    channels: 192
+
+  encoder:
+    channels: 192
+    n_heads: 2
+    n_layers: 6
+    dropout: 0.1
+
+  variance_adopter:
+    in_channels: 192
+    channels: 256
+    dropout: 0.1
+
+  decoder:
+    channels: 192
+    n_heads: 2
+    n_layers: 6
+    kernel_size: 7
+    dropout: 0.1
+
+optimizer:
+  lr: 1.0
+
+scheduler:
+  mode: noam
+  warmup_steps: 4000
+  channels: 192
+
