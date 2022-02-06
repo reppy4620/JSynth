@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from .base import PreProcessorBase
 from ..transforms import MelSpectrogramWithEnergy
-from ...from_x import tokenizer_from_config
+from ..tokenizers import Tokenizer
 
 ORIG_SR = None
 NEW_SR = None
@@ -26,7 +26,7 @@ class NormalPreProcessor(PreProcessorBase):
 
         self.to_mel = MelSpectrogramWithEnergy(params=None)
 
-        self.tokenizer = tokenizer_from_config(config)
+        self.tokenizer = Tokenizer.from_config(config.tokenizer)
 
         global ORIG_SR, NEW_SR
         ORIG_SR = config.orig_sr

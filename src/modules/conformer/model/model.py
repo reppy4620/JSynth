@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ...common import ModelBase
+from ...common.model import ModelBase
 
 from .layers import EmbeddingLayer, RelPositionalEncoding, PostNet
 from .conformer import Conformer
@@ -15,7 +15,7 @@ class ConformerModel(ModelBase):
     def __init__(self, params):
         super().__init__()
 
-        self.emb = EmbeddingLayer(**params.embedding, channels=params.encoder.channels)
+        self.emb = EmbeddingLayer(**params.embedding)
         self.relative_pos_emb = RelPositionalEncoding(
             params.encoder.channels,
             params.encoder.dropout

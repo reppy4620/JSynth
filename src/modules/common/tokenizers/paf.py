@@ -8,7 +8,7 @@ from .base import TokenizerBase
 
 class PAFTokenizer(TokenizerBase):
 
-    def __init__(self, dictionary_path='./word_index.txt', state_size=1):
+    def __init__(self, dictionary_path='./word_index.txt', state_size=1, **kwargs):
         self.state_size = state_size
 
         self.p_dict = self.load_dictionary(dictionary_path)
@@ -36,7 +36,7 @@ class PAFTokenizer(TokenizerBase):
         f_id = [self.f_dict[s] for s in f]
 
         p_id = torch.LongTensor(p_id)
-        a_id = torch.FloatTensor(a_id)
+        a_id = torch.LongTensor(a_id)
         f_id = torch.LongTensor(f_id)
         return p_id, a_id, f_id
 

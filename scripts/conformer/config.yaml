@@ -3,14 +3,14 @@ seed: 42
 output_dir: ./out
 
 preprocess:
+  mode: normal
+  tokenizer:
+    mode: paf
   wav_dir: /disk/fs1/Corpus/JSUT/jsut_ver1.1/basic5000/wav
   label_dir: /disk/fs1/Corpus/JSUT/jsut-label/labels/basic5000
   output_dir: ./dataset
   orig_sr: 48000
   new_sr: 24000
-
-preprocessor: normal
-tokenizer: paf
 
 train:
   batch_size: 16

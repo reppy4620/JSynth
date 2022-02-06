@@ -6,7 +6,7 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import CSVLogger, TensorBoardLogger
 
-from modules.from_x import module_from_config
+from modules import PLModule
 from callbacks import IntervalCheckpoint
 
 
@@ -21,7 +21,7 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     OmegaConf.save(config, f'{config.output_dir}/config.yaml')
 
-    module = module_from_config(config)
+    module = PLModule.from_config(config)
 
     best_cp = ModelCheckpoint(
         dirpath=config.output_dir,

@@ -4,9 +4,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class EmbeddingLayer(nn.Module):
+class TTSLearnEmbeddingLayer(nn.Module):
     def __init__(self, n_phoneme, channels):
-        super(EmbeddingLayer, self).__init__()
+        super(TTSLearnEmbeddingLayer, self).__init__()
         self.scale = math.sqrt(channels)
 
         self.emb = nn.Embedding(n_phoneme, channels)
@@ -16,6 +16,42 @@ class EmbeddingLayer(nn.Module):
         x = self.emb(x) * self.scale
         x = x.transpose(-1, -2)
         return x
+
+
+class PAFEmbeddingLayer(nn.Module):
+    def __init__(self, n_p, n_a, n_f, channels):
+        super(PAFEmbeddingLayer, self).__init__()
+        self.scale = math.sqrt(channels)
+
+        self.p_emb = nn.Embedding(n_p, channels)
+        nn.init.normal_(self.p_emb.weight, 0.0, channels ** -0.5)
+
+        self.a_emb = nn.Embedding(n_a, channels)
+        nn.init.normal_(self.a_emb.weight, 0.0, channels ** -0.5)
+
+        self.f_emb = nn.Embedding(n_f, channels)
+        nn.init.normal_(self.f_emb.weight, 0.0, channels ** -0.5)
+
+    def forward(self, p, a, f):
+        p = self.p_emb(p) * self.scale
+        a = self.a_emb(a) * self.scale
+        f = self.f_emb(f) * self.scale
+        x = torch.cat([p, a, f], dim=-1).transpose(-1, -2)
+        return x
+
+
+class EmbeddingLayer(nn.Module):
+    _d = {
+        'ttslearn': TTSLearnEmbeddingLayer,
+        'paf': PAFEmbeddingLayer
+    }
+
+    def __init__(self, mode, **kwargs):
+        super(EmbeddingLayer, self).__init__()
+        self.emb = self._d[mode](**kwargs)
+
+    def forward(self, *args, **kwargs):
+        return self.emb(*args, **kwargs)
 
 
 class ConvolutionModule(nn.Module):
@@ -121,8 +157,8 @@ class PostNet(nn.Module):
 class RelPositionalEncoding(nn.Module):
     def __init__(self, channels, dropout=0.1, max_len=10000):
         super(RelPositionalEncoding, self).__init__()
-        self.d_model = channels
-        self.scale = math.sqrt(self.d_model)
+        self.channels = channels
+        self.scale = math.sqrt(self.channels)
         self.dropout = torch.nn.Dropout(p=dropout)
         self.pe = None
         self.extend_pe(torch.tensor(0.0).expand(1, max_len))
@@ -133,12 +169,12 @@ class RelPositionalEncoding(nn.Module):
                 if self.pe.dtype != x.dtype or self.pe.device != x.device:
                     self.pe = self.pe.to(dtype=x.dtype, device=x.device)
                 return
-        pe_positive = torch.zeros(x.size(1), self.d_model)
-        pe_negative = torch.zeros(x.size(1), self.d_model)
+        pe_positive = torch.zeros(x.size(1), self.channels)
+        pe_negative = torch.zeros(x.size(1), self.channels)
         position = torch.arange(0, x.size(1), dtype=torch.float32).unsqueeze(1)
         div_term = torch.exp(
-            torch.arange(0, self.d_model, 2, dtype=torch.float32)
-            * -(math.log(10000.0) / self.d_model)
+            torch.arange(0, self.channels, 2, dtype=torch.float32)
+            * -(math.log(10000.0) / self.channels)
         )
         pe_positive[:, 0::2] = torch.sin(position * div_term)
         pe_positive[:, 1::2] = torch.cos(position * div_term)
