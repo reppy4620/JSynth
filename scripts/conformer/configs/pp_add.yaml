@@ -37,7 +37,6 @@ model:
     channels: 192
     n_heads: 2
     n_layers: 6
-    kernel_size: 7
     dropout: 0.1
 
   variance_adopter:
@@ -49,7 +48,6 @@ model:
     channels: 192
     n_heads: 2
     n_layers: 6
-    kernel_size: 7
     dropout: 0.1
 
 optimizer:
