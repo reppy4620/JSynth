@@ -1,2 +1,0 @@
-./preprocess.sh
-./train.sh
