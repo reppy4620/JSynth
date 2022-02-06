@@ -19,7 +19,7 @@ train:
   save_interval: 100
 
 data:
-  data_dir: ./dataset
+  data_dir: ./dataset_pp_add
   valid_size: 100
   tokenizer:
     mode: pp_add
