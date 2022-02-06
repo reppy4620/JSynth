@@ -45,10 +45,8 @@ class PPAddTokenizer(TokenizerBase):
             # 無声化母音を通常の母音として扱う
             if drop_unvoiced_vowels and p3 in "AEIOU":
                 p3 = p3.lower()
-            flag = False
             # 先頭と末尾の sil のみ例外対応
             if p3 == "sil":
-                flag = True
                 assert n == 0 or n == N - 1
                 if n == 0:
                     prosody.append("^")
@@ -84,7 +82,7 @@ class PPAddTokenizer(TokenizerBase):
             # ピッチの立ち上がり
             elif a2 == 1 and a2_next == 2:
                 prosody.append("[")
-            elif not flag:
+            else:
                 prosody.append('_')
 
         return phoneme, prosody
