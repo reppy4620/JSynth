@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import torch.optim as optim
 from torch.utils.data import Subset, DataLoader
 from pytorch_lightning import LightningModule
@@ -43,6 +44,9 @@ class ConformerModule(LightningModule):
 
         if batch_idx == 0:
             o = self.model(batch)
+            plt.figure(figsize=(8, 6))
+            plt.imshow(o[0].squeeze().detach().cpu().numpy())
+            plt.savefig(f'{self.output_dir}/latest.png')
 
     def configure_optimizers(self):
         opt = optim.AdamW(self.model.parameters(), **self.params.optimizer)
