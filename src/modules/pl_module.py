@@ -8,4 +8,4 @@ class PLModule:
 
     @classmethod
     def from_config(cls, config):
-        return cls._d[config.name](config.model)
+        return cls._d[config.name](config)
