@@ -55,7 +55,7 @@ model:
 optimizer:
   lr: 0.0003
 
-sheduler:
+scheduler:
   mode: noam
   warmup_steps: 4000
   channels: 192
