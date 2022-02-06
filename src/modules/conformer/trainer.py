@@ -1,4 +1,5 @@
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 import torch
 import torch.optim as optim
@@ -93,6 +94,24 @@ class Trainer:
                 loss_dict = model.compute_loss(batch)
                 loss_dict = {k: l.item() for k, l in loss_dict.items()}
                 tracker.update(**loss_dict)
+                if i == 0:
+                    (
+                        *labels,
+                        x_length,
+                        y,
+                        y_length,
+                        duration,
+                        pitch,
+                        energy
+                    ) = batch
+                    o = self.model([*labels, x_length])
+                    plt.figure(figsize=(8, 6))
+                    plt.subplot(2, 1, 1)
+                    plt.imshow(o[0].squeeze().detach().cpu().numpy(), aspect='auto', origin='lower')
+                    plt.subplot(2, 1, 2)
+                    plt.imshow(y[0].squeeze().detach().cpu().numpy(), aspect='auto', origin='lower')
+                    plt.savefig(f'./out/latest.png')
+                    plt.close()
         self.write_losses(epoch, writer, tracker, mode='valid')
 
     def prepare_data(self, config):
