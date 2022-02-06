@@ -1,7 +1,7 @@
 import re
 import torch
 from nnmnkwii.io import hts
-from ttslearn.tacotron.frontend.openjtalk import numeric_feature_by_regex
+from ttslearn.tacotron.frontend.openjtalk import pp_symbols, numeric_feature_by_regex
 from ttslearn.tacotron.frontend.openjtalk import phonemes, extra_symbols, num_vocab
 from .base import TokenizerBase
 
@@ -26,7 +26,7 @@ class PPAddTokenizer(TokenizerBase):
     def extract(self, label_path, sr, y_length):
         label = hts.load(label_path)
         phoneme, prosody = self.pp_symbols(label.contexts)
-        assert len(phoneme) == len(prosody), f'\n{phoneme}\n{prosody}\n{len(phoneme)}, {len(prosody)}'
+        assert len(phoneme) == len(prosody), f'\n{pp_symbols(label.contexts)}\n{phoneme}\n{prosody}\n{len(phoneme)}, {len(prosody)}'
 
         duration = self.extract_duration(label, sr, y_length)
         return (phoneme, prosody), duration
