@@ -47,6 +47,7 @@ class ConformerModule(LightningModule):
             plt.figure(figsize=(8, 6))
             plt.imshow(o[0].squeeze().detach().cpu().numpy())
             plt.savefig(f'{self.output_dir}/latest.png')
+            plt.close()
 
     def configure_optimizers(self):
         opt = optim.AdamW(self.model.parameters(), **self.params.optimizer)
