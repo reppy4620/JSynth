@@ -90,7 +90,7 @@ class Trainer:
         tracker = Tracker()
         with torch.no_grad():
             for i, batch in enumerate(loader):
-                loss_dict = model.compute_loss(batch, model, tracker)
+                loss_dict = model.compute_loss(batch)
                 loss_dict = {k: l.item() for k, l in loss_dict.items()}
                 tracker.update(**loss_dict)
         self.write_losses(epoch, writer, tracker, mode='valid')

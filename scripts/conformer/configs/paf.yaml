@@ -14,7 +14,7 @@ preprocess:
   new_sr: 24000
 
 train:
-  batch_size: 16
+  batch_size: 32
   num_epochs: 1000
   monitor: valid/recon
   save_interval: 100
@@ -43,7 +43,7 @@ model:
 
   variance_adopter:
     in_channels: 192
-    channels: 256
+    channels: 192
     dropout: 0.1
 
   decoder:
