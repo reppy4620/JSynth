@@ -78,7 +78,7 @@ class NormalPreProcessor(PreProcessorBase):
             assert pitch.shape[0] == mel.size(-1)
             assert energy.shape[0] == mel.size(-1)
 
-            if i == 0:
+            if i < 3:
                 print(wav.size())
                 print(mel.size())
                 print(label)
