@@ -30,8 +30,8 @@ model:
   embedding:
     mode: paf
     n_p: 38
-    n_a: 27
-    n_f: 18
+    n_a: 28
+    n_f: 19
     channels: 192
 
   encoder:
