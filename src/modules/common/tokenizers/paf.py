@@ -54,6 +54,8 @@ class PAFTokenizer(TokenizerBase):
         for context in label.contexts:
             if context.split("-")[1].split("+")[0] == "pau":
                 p_list += ["pau"]
+                a_list += ["xx"]
+                f_list += ["xx"]
                 continue
             elif context.split("-")[1].split("+")[0] == "sil":
                 continue

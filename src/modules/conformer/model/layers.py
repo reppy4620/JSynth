@@ -23,21 +23,19 @@ class PAFEmbeddingLayer(nn.Module):
         super(PAFEmbeddingLayer, self).__init__()
         self.scale = math.sqrt(channels)
 
-        self.p_emb = nn.Embedding(n_p, channels)
+        self.p_emb = nn.Embedding(n_p, channels, padding_idx=0)
         nn.init.normal_(self.p_emb.weight, 0.0, channels ** -0.5)
 
-        self.a_emb = nn.Embedding(n_a, channels)
+        self.a_emb = nn.Embedding(n_a, channels, padding_idx=0)
         nn.init.normal_(self.a_emb.weight, 0.0, channels ** -0.5)
 
-        self.f_emb = nn.Embedding(n_f, channels)
+        self.f_emb = nn.Embedding(n_f, channels, padding_idx=0)
         nn.init.normal_(self.f_emb.weight, 0.0, channels ** -0.5)
 
     def forward(self, p, a, f):
-        print(p.size(), a.size(), f.size())
-        p = self.p_emb(p)
-        a = self.a_emb(a)
-        f = self.f_emb(f)
-        print(p.size(), a.size(), f.size())
+        p = self.p_emb(p) * self.scale
+        a = self.a_emb(a) * self.scale
+        f = self.f_emb(f) * self.scale
         x = torch.cat([p, a, f], dim=-1).transpose(-1, -2)
         return x
 
