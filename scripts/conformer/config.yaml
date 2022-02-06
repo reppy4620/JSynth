@@ -5,10 +5,10 @@ output_dir: ./out
 preprocess:
   mode: normal
   tokenizer:
-    mode: pp_add
+    mode: paf
   wav_dir: /disk/fs1/Corpus/JSUT/jsut_ver1.1/basic5000/wav
   label_dir: /disk/fs1/Corpus/JSUT/jsut-label/labels/basic5000
-  output_dir: ../../dataset/pp_add
+  output_dir: ../../dataset/paf
   orig_sr: 48000
   new_sr: 24000
 
@@ -19,7 +19,7 @@ train:
   save_interval: 100
 
 data:
-  data_dir: ../../dataset/pp_add
+  data_dir: ../../dataset/paf
   valid_size: 100
   tokenizer:
     mode: pp_add
@@ -28,7 +28,7 @@ model:
   n_mel: 80
 
   embedding:
-    mode: pp_add
+    mode: paf
     n_phoneme: 45
     n_prosody: 8
     channels: 192
