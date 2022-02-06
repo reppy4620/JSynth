@@ -17,6 +17,18 @@ class PAFTokenizer(TokenizerBase):
         self.a_dict = self.build_num_dict(start=-15, end=9)
         self.f_dict = self.build_num_dict(start=0, end=16)
 
+    def tokenize(self, inputs):
+        p, a, f = inputs
+        p_id = [self.p_dict[s] for s in p]
+        a_id = [self.a_dict[s] for s in a]
+        f_id = [self.f_dict[s] for s in f]
+
+        p_id = torch.LongTensor(p_id)
+        a_id = torch.LongTensor(a_id)
+        f_id = torch.LongTensor(f_id)
+        is_transpose = [0, 0, 0]
+        return p_id, a_id, f_id, is_transpose
+
     @staticmethod
     def load_dictionary():
         dictionary = dict()
@@ -29,18 +41,6 @@ class PAFTokenizer(TokenizerBase):
         d = {str(k): i for i, k in enumerate(range(start, end + 1), start=1)}
         d['xx'] = len(d) + 1
         return d
-
-    def tokenize(self, inputs):
-        p, a, f = inputs
-        p_id = [self.p_dict[s] for s in p]
-        a_id = [self.a_dict[s] for s in a]
-        f_id = [self.f_dict[s] for s in f]
-
-        p_id = torch.LongTensor(p_id)
-        a_id = torch.LongTensor(a_id)
-        f_id = torch.LongTensor(f_id)
-        is_transpose = [0, 0, 0]
-        return p_id, a_id, f_id, is_transpose
 
     def __len__(self):
         return len(self.p_dict)
