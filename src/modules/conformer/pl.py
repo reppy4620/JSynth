@@ -3,7 +3,7 @@ import torch.optim as optim
 from torch.utils.data import Subset, DataLoader
 from pytorch_lightning import LightningModule
 
-from .model import ConformerModel
+from .model2 import TTSModel
 from .dataset import ConformerDataset, collate_fn
 from ..common.schedulers import Scheduler
 from ..utils import add_prefix
@@ -13,7 +13,7 @@ class ConformerModule(LightningModule):
     def __init__(self, params):
         super(ConformerModule, self).__init__()
         self.params = params
-        self.model = ConformerModel(params.model)
+        self.model = TTSModel(params.model)
 
     def forward(self, *args, **kwargs):
         return self.model(*args, **kwargs)
