@@ -1,5 +1,3 @@
-from abc import ABC
-
 import torch.optim as optim
 from torch.utils.data import Subset, DataLoader
 from pytorch_lightning import LightningModule
