@@ -83,6 +83,6 @@ class PPAddTokenizer(TokenizerBase):
                 if n != 1:
                     prosody.append('_')
 
-            assert len(phoneme) == len(prosody), f'\n{phoneme}\n{prosody}'
+            assert len(phoneme) == len(prosody), f'\n{phoneme}\n{prosody}\n{labels}'
 
         return phoneme, prosody
