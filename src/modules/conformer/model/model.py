@@ -7,7 +7,6 @@ from ...common.model.layers import EmbeddingLayer
 
 from .layers import RelPositionalEncoding, PostNet
 from .conformer import Conformer
-from .transformer import Transformer
 from .predictors import VarianceAdopter
 from .utils import sequence_mask, generate_path
 
@@ -22,7 +21,7 @@ class ConformerModel(ModelBase):
             params.encoder.channels,
             params.encoder.dropout
         )
-        self.encoder = Transformer(**params.encoder)
+        self.encoder = Conformer(**params.encoder)
         self.variance_adopter = VarianceAdopter(**params.variance_adopter)
         self.decoder = Conformer(**params.decoder)
 
