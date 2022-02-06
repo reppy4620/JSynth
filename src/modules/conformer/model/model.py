@@ -76,7 +76,7 @@ class ConformerModel(ModelBase):
         x = self.out_conv(x)
         x *= y_mask
 
-        recon_loss = F.mse_loss(x, y)
+        recon_loss = F.l1_loss(x, y)
         duration_loss = F.mse_loss(dur_pred, duration.to(x.dtype))
         pitch_loss = F.mse_loss(pitch_pred, pitch.to(x.dtype))
         energy_loss = F.mse_loss(energy_pred, energy.to(x.dtype))
