@@ -43,7 +43,16 @@ class ConformerModule(LightningModule):
         )
 
         if batch_idx == 0:
-            o = self.model(batch)
+            (
+                *labels,
+                x_length,
+                y,
+                y_length,
+                duration,
+                pitch,
+                energy
+            ) = batch
+            o = self.model([*labels, x_length])
             plt.figure(figsize=(8, 6))
             plt.imshow(o[0].squeeze().detach().cpu().numpy())
             plt.savefig(f'{self.output_dir}/latest.png')
