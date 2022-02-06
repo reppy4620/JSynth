@@ -83,7 +83,7 @@ class PPAddTokenizer(TokenizerBase):
             elif a2 == 1 and a2_next == 2:
                 prosody.append("[")
             else:
-                if n != 1 or n != N - 2:
+                if n != 1 and n != N - 2:
                     prosody.append('_')
 
         return phoneme, prosody
