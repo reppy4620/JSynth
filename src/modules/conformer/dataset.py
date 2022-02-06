@@ -55,6 +55,7 @@ def collate_fn(batch):
     for i, inp in enumerate(inputs):
         x = pad_sequence(inp, batch_first=True)
         if is_transpose[i]:
+            print('transpose')
             x = x.transpose(-1, -2)
         inp_list.append(x)
     print(inp_list[0].size())
