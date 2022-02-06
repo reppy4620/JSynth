@@ -80,8 +80,7 @@ class PPAddTokenizer(TokenizerBase):
             elif a2 == 1 and a2_next == 2:
                 prosody.append("[")
             else:
-                if n != 1 and n != N - 2:
+                if prosody[-1] != '$':
                     prosody.append('_')
-            assert len(phoneme) == len(prosody), f'\n{phoneme}\n{prosody}'
 
         return phoneme, prosody
