@@ -36,6 +36,7 @@ class PPAddTokenizer(TokenizerBase):
         phoneme, prosody = list(), list()
         N = len(labels)
         # 各音素毎に順番に処理
+        flag = False
         for n in range(N):
             lab_curr = labels[n]
 
@@ -61,6 +62,10 @@ class PPAddTokenizer(TokenizerBase):
             else:
                 phoneme.append(p3)
 
+            if flag:
+                flag = False
+                continue
+
             # アクセント型および位置情報（前方または後方）
             a1 = numeric_feature_by_regex(r"/A:([0-9\-]+)\+", lab_curr)
             a2 = numeric_feature_by_regex(r"\+(\d+)\+", lab_curr)
@@ -83,6 +88,7 @@ class PPAddTokenizer(TokenizerBase):
                 if n != 1:
                     prosody.append('_')
 
-            assert len(phoneme) == len(prosody), f'\n{phoneme}\n{prosody}\n{labels}'
+            if len(phoneme) != len(prosody):
+                flag = True
 
         return phoneme, prosody
