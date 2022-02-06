@@ -22,7 +22,7 @@ data:
   data_dir: ../../dataset/paf
   valid_size: 100
   tokenizer:
-    mode: pp_add
+    mode: paf
 
 model:
   n_mel: 80
