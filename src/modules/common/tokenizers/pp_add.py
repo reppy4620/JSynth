@@ -1,18 +1,22 @@
 import torch
 from nnmnkwii.io import hts
 from ttslearn.tacotron.frontend.openjtalk import pp_symbols
-from ttslearn.tacotron.frontend.openjtalk import text_to_sequence, phonemes, extra_symbols, num_vocab
+from ttslearn.tacotron.frontend.openjtalk import phonemes, extra_symbols, num_vocab
 from .base import TokenizerBase
 
 
 class PPAddTokenizer(TokenizerBase):
-    def __init__(self):
-        self.extra_symbol_set = set(extra_symbols)
 
-    def tokenize(self, text):
-        inp = text_to_sequence(text.split())
-        is_extra = [s in self.extra_symbol_set for s in text.split()]
-        return torch.LongTensor(inp), torch.FloatTensor(is_extra)
+    def __init__(self):
+        self.phoneme_dict = {s: i for i, s in enumerate(['<pad>'] + phonemes)}
+        self.prosody_dict = {s: i for i, s in enumerate(['<pad>'] + extra_symbols)}
+
+    def tokenize(self, inputs):
+        phoneme, prosody = inputs
+        phoneme = [self.phoneme_dict[s] for s in phoneme]
+        prosody = [self.prosody_dict[s] for s in prosody]
+        is_transpose = [0, 0]
+        return torch.LongTensor(phoneme), torch.FloatTensor(prosody), is_transpose
 
     def __len__(self):
         return num_vocab()

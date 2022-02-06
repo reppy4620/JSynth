@@ -1,11 +1,13 @@
 from .ttslearn import TTSLearnTokenizer
 from .paf import PAFTokenizer
+from .pp_add import PPAddTokenizer
 
 
 class Tokenizer:
     _d = {
         'ttslearn': TTSLearnTokenizer,
-        'paf': PAFTokenizer
+        'paf': PAFTokenizer,
+        'pp_add': PPAddTokenizer
     }
 
     @classmethod
