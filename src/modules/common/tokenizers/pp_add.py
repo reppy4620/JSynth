@@ -58,9 +58,6 @@ class PPAddTokenizer(TokenizerBase):
                     elif e3 == 1:
                         prosody.append("?")
                 continue
-            elif p3 == "pau":
-                phoneme.append("pau")
-                continue
             else:
                 phoneme.append(p3)
 
