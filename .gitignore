@@ -471,4 +471,4 @@ dmypy.json
 cython_debug/
 
 **/out/
-**configs/
+**/configs/
