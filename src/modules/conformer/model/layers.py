@@ -33,6 +33,7 @@ class PAFEmbeddingLayer(nn.Module):
         nn.init.normal_(self.f_emb.weight, 0.0, channels ** -0.5)
 
     def forward(self, p, a, f):
+        print(p.size(), a.size(), f.size())
         p = self.p_emb(p) * self.scale
         a = self.a_emb(a) * self.scale
         f = self.f_emb(f) * self.scale
