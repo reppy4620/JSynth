@@ -56,8 +56,6 @@ class ConformerModel(ModelBase):
             energy
         ) = batch
         x = self.emb(*labels)
-        print(labels[0].size(), labels[1].size())
-        print(x.size())
         x, pos_emb = self.relative_pos_emb(x)
 
         x_mask = sequence_mask(x_length).unsqueeze(1).to(x.dtype)
