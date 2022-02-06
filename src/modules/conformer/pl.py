@@ -53,10 +53,9 @@ class ConformerModule(LightningModule):
                 energy
             ) = batch
             o = self.model([*labels, x_length])
-            print(o.size())
             plt.figure(figsize=(8, 6))
             plt.imshow(o[0].squeeze().detach().cpu().numpy(), aspect='auto', origin='lower')
-            plt.savefig(f'{self.output_dir}/latest.png')
+            plt.savefig(f'{self.params.output_dir}/latest.png')
             plt.close()
 
     def configure_optimizers(self):
