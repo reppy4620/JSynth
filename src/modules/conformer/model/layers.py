@@ -61,7 +61,8 @@ class PPAddEmbeddingLayer(nn.Module):
 class EmbeddingLayer(nn.Module):
     _d = {
         'ttslearn': TTSLearnEmbeddingLayer,
-        'paf': PAFEmbeddingLayer
+        'paf': PAFEmbeddingLayer,
+        'pp_add': PPAddEmbeddingLayer
     }
 
     def __init__(self, mode, **kwargs):
