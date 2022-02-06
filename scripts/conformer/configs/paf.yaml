@@ -1,6 +1,7 @@
 name: conformer
 seed: 42
 output_dir: ./out
+resume_checkpoint: false
 
 preprocess:
   mode: normal
