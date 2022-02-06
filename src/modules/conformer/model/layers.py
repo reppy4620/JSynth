@@ -40,6 +40,24 @@ class PAFEmbeddingLayer(nn.Module):
         return x
 
 
+class PPAddEmbeddingLayer(nn.Module):
+    def __init__(self, n_phoneme, n_prosody, channels):
+        super(PPAddEmbeddingLayer, self).__init__()
+        self.scale = math.sqrt(channels)
+
+        self.phoneme_emb = nn.Embedding(n_phoneme, channels)
+        nn.init.normal_(self.p_emb.weight, 0.0, channels ** -0.5)
+
+        self.prosody_emb = nn.Embedding(n_prosody, channels)
+        nn.init.normal_(self.a_emb.weight, 0.0, channels ** -0.5)
+
+    def forward(self, phoneme, prosody):
+        phoneme = self.phoneme_emb(phoneme) * self.scale
+        prosody = self.prosody_emb(prosody) * self.scale
+        x = (phoneme + prosody).transpose(-1, -2)
+        return x
+
+
 class EmbeddingLayer(nn.Module):
     _d = {
         'ttslearn': TTSLearnEmbeddingLayer,

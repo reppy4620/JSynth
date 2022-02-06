@@ -28,6 +28,7 @@ model:
   n_mel: 80
 
   embedding:
+    mode: pp_add
     n_phoneme: 52
 
   encoder:
