@@ -46,10 +46,10 @@ class PPAddEmbeddingLayer(nn.Module):
         self.scale = math.sqrt(channels)
 
         self.phoneme_emb = nn.Embedding(n_phoneme, channels)
-        nn.init.normal_(self.p_emb.weight, 0.0, channels ** -0.5)
+        nn.init.normal_(self.phoneme_emb.weight, 0.0, channels ** -0.5)
 
         self.prosody_emb = nn.Embedding(n_prosody, channels)
-        nn.init.normal_(self.a_emb.weight, 0.0, channels ** -0.5)
+        nn.init.normal_(self.prosody_emb.weight, 0.0, channels ** -0.5)
 
     def forward(self, phoneme, prosody):
         phoneme = self.phoneme_emb(phoneme) * self.scale
