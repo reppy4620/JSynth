@@ -24,7 +24,7 @@ class Trainer:
 
         seed_everything(config.seed)
 
-        output_dir = Path(config.model_dir)
+        output_dir = Path(config.output_dir)
         output_dir.mkdir(exist_ok=True, parents=True)
 
         OmegaConf.save(config, output_dir / 'config.yaml')
