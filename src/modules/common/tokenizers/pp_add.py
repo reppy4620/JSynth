@@ -1,6 +1,7 @@
+import re
 import torch
 from nnmnkwii.io import hts
-from ttslearn.tacotron.frontend.openjtalk import pp_symbols, numeric_feature_by_regex
+from ttslearn.tacotron.frontend.openjtalk import numeric_feature_by_regex
 from ttslearn.tacotron.frontend.openjtalk import phonemes, extra_symbols, num_vocab
 from .base import TokenizerBase
 
