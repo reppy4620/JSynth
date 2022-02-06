@@ -26,6 +26,7 @@ class ConformerDataset(Dataset):
             energy
         ) = torch.load(self.data[idx])
         *inputs, is_transpose = self.tokenizer(inputs)
+        duration = duration.float()
         return (
             mel.transpose(-1, -2),
             *inputs,
