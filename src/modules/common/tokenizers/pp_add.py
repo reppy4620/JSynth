@@ -54,9 +54,9 @@ class PPAddTokenizer(TokenizerBase):
                     # 疑問系かどうか
                     e3 = numeric_feature_by_regex(r"!(\d+)_", lab_curr)
                     if e3 == 0:
-                        prosody.append("$")
+                        prosody[-1] = "$"
                     elif e3 == 1:
-                        prosody.append("?")
+                        prosody[-1] = "?"
                 continue
             else:
                 phoneme.append(p3)
