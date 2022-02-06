@@ -33,13 +33,10 @@ class PAFEmbeddingLayer(nn.Module):
         nn.init.normal_(self.f_emb.weight, 0.0, channels ** -0.5)
 
     def forward(self, p, a, f):
-        print(p[0])
-        print(a[0])
-        print(f[0])
         print(p.size(), a.size(), f.size())
-        p = self.p_emb(p) * self.scale
-        a = self.a_emb(a) * self.scale
-        f = self.f_emb(f) * self.scale
+        p = self.p_emb(p)
+        a = self.a_emb(a)
+        f = self.f_emb(f)
         print(p.size(), a.size(), f.size())
         x = torch.cat([p, a, f], dim=-1).transpose(-1, -2)
         return x
