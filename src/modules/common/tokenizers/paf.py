@@ -4,23 +4,22 @@ import torch
 from nnmnkwii.io import hts
 
 from .base import TokenizerBase
+from .phonemes import phonemes
 
 
 class PAFTokenizer(TokenizerBase):
 
-    def __init__(self, dictionary_path='./word_index.txt', state_size=1, **kwargs):
+    def __init__(self, state_size=1, **kwargs):
         self.state_size = state_size
 
-        self.p_dict = self.load_dictionary(dictionary_path)
+        self.p_dict = self.load_dictionary()
         self.a_dict = self.build_num_dict(start=-15, end=9)
         self.f_dict = self.build_num_dict(start=0, end=16)
 
     @staticmethod
-    def load_dictionary(path):
-        with open(path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
+    def load_dictionary():
         dictionary = dict()
-        for i, w in enumerate([w.strip() for w in lines]):
+        for i, w in enumerate(phonemes):
             dictionary[w] = i
         return dictionary
 
