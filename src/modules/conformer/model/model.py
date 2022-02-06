@@ -3,8 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ...common.model import ModelBase
+from ...common.model.layers import EmbeddingLayer
 
-from .layers import EmbeddingLayer, RelPositionalEncoding, PostNet
+from .layers import RelPositionalEncoding, PostNet
 from .conformer import Conformer
 from .predictors import VarianceAdopter
 from .utils import sequence_mask, generate_path
@@ -76,6 +77,10 @@ class ConformerModel(ModelBase):
         x = self.out_conv(x)
         x *= y_mask
 
+        assert x.size() == y.size() and \
+               dur_pred.size() == duration.size() and \
+               pitch_pred.size() == pitch.size() and \
+               energy.size() == energy.size()
         recon_loss = F.l1_loss(x, y)
         duration_loss = F.mse_loss(dur_pred, duration)
         pitch_loss = F.mse_loss(pitch_pred, pitch)
