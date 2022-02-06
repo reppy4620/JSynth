@@ -29,8 +29,9 @@ model:
 
   embedding:
     mode: paf
-    n_phoneme: 45
-    n_prosody: 8
+    n_p: 38
+    n_a: 27
+    n_f: 18
     channels: 192
 
   encoder:
