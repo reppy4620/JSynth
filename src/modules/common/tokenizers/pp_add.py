@@ -39,7 +39,7 @@ class PPAddTokenizer(TokenizerBase):
                     prosody.append(p)
             else:
                 raise ValueError('p is invalid value')
-        assert len(phoneme) == len(prosody), f'\n{phoneme}\n{prosody}\n{len(phoneme)}, {len(prosody)}'
+        assert len(phoneme) == len(prosody), f'\n{pp}\n{phoneme}\n{prosody}\n{len(phoneme)}, {len(prosody)}'
 
         duration = self.extract_duration(label, sr, y_length)
         return (phoneme, prosody), duration
