@@ -39,7 +39,7 @@ class PAFTokenizer(TokenizerBase):
         p_id = torch.LongTensor(p_id)
         a_id = torch.LongTensor(a_id)
         f_id = torch.LongTensor(f_id)
-        return p_id, a_id, f_id
+        return p_id, a_id, f_id, [0, 0, 0]
 
     def __len__(self):
         return len(self.p_dict)
