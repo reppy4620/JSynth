@@ -1,17 +1,16 @@
-import torch
-import torch.nn.functional as F
-import torch.optim as optim
-
-from torch.utils.tensorboard import SummaryWriter
-
-from tqdm import tqdm
 from pathlib import Path
-from omegaconf import OmegaConf
+
+import torch
+import torch.optim as optim
 from accelerate import Accelerator
-from .pl import ConformerModule
+from omegaconf import OmegaConf
 from pytorch_lightning import seed_everything
-from ..common.schedulers.noam import NoamLR
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
+
+from .pl import ConformerModule
 from .utils import Tracker
+from ..common.schedulers.noam import NoamLR
 
 
 class Trainer:
@@ -71,13 +70,15 @@ class Trainer:
         tracker = Tracker()
         bar = tqdm(desc=f'Epoch: {epoch + 1}', total=len(loader), disable=not accelerator.is_main_process)
         for i, batch in enumerate(loader):
-            loss = self._handle_batch(batch, model, tracker)
+            loss_dict = model.compute_loss(batch)
             optimizer.zero_grad()
-            accelerator.backward(loss)
+            accelerator.backward(loss_dict['loss'])
             accelerator.clip_grad_norm_(model.parameters(), 5)
             optimizer.step()
             scheduler.step()
             bar.update()
+            loss_dict = {k: l.item() for k, l in loss_dict.items()}
+            tracker.update(**loss_dict)
             self.set_losses(bar, tracker)
         self.set_losses(bar, tracker)
         if accelerator.is_main_process:
@@ -89,37 +90,10 @@ class Trainer:
         tracker = Tracker()
         with torch.no_grad():
             for i, batch in enumerate(loader):
-                _ = self._handle_batch(batch, model, tracker)
+                loss_dict = model.compute_loss(batch, model, tracker)
+                loss_dict = {k: l.item() for k, l in loss_dict.items()}
+                tracker.update(**loss_dict)
         self.write_losses(epoch, writer, tracker, mode='valid')
-
-    def _handle_batch(self, batch, model, tracker):
-        (
-            mel,
-            phoneme,
-            a1,
-            f2,
-            pitch,
-            energy,
-            duration,
-            x_length,
-            y_length
-        ) = batch
-        x, (dur_pred, pitch_pred, energy_pred), (x_mask, y_mask) = model(
-            phoneme, a1, f2, x_length, y_length, duration, pitch, energy
-        )
-        loss_recon = F.l1_loss(x, mel)
-        loss_duration = F.mse_loss(dur_pred, duration.to(x.dtype))
-        loss_pitch = F.mse_loss(pitch_pred, pitch.to(x.dtype))
-        loss_energy = F.mse_loss(energy_pred, energy.to(x.dtype))
-        loss = loss_recon + loss_duration + loss_pitch + loss_energy
-        tracker.update(
-            loss=loss.item(),
-            recon=loss_recon.item(),
-            duration=loss_duration.item(),
-            pitch=loss_pitch.item(),
-            energy=loss_energy.item()
-        )
-        return loss
 
     def prepare_data(self, config):
         data_dir = Path(config.data_dir)
