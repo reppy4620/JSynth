@@ -1,6 +1,6 @@
 import torch
 from nnmnkwii.io import hts
-from ttslearn.tacotron.frontend.openjtalk import pp_symbols
+from ttslearn.tacotron.frontend.openjtalk import pp_symbols, numeric_feature_by_regex
 from ttslearn.tacotron.frontend.openjtalk import phonemes, extra_symbols, num_vocab
 from .base import TokenizerBase
 
@@ -24,22 +24,66 @@ class PPAddTokenizer(TokenizerBase):
 
     def extract(self, label_path, sr, y_length):
         label = hts.load(label_path)
-        pp = pp_symbols(label.contexts)
-        phoneme, prosody = list(), list()
-        for i, p in enumerate(pp):
-            if p in phonemes:
-                phoneme.append(p)
-                if i != 0 or i != len(pp) - 1:
-                    prosody.append('_')
-            elif p in extra_symbols:
-                if p == '_':
-                    phoneme.append('pau')
-                    prosody.append('_')
-                else:
-                    prosody.append(p)
-            else:
-                raise ValueError('p is invalid value')
-        assert len(phoneme) == len(prosody), f'\n{pp}\n{phoneme}\n{prosody}\n{len(phoneme)}, {len(prosody)}'
+        phoneme, prosody = self.pp_symbols(label.contexts)
+        assert len(phoneme) == len(prosody), f'\n{phoneme}\n{prosody}\n{len(phoneme)}, {len(prosody)}'
 
         duration = self.extract_duration(label, sr, y_length)
         return (phoneme, prosody), duration
+
+    @staticmethod
+    def pp_symbols(labels, drop_unvoiced_vowels=True):
+        phoneme, prosody = list(), list()
+        N = len(labels)
+        # 各音素毎に順番に処理
+        for n in range(N):
+            lab_curr = labels[n]
+
+            # 当該音素
+            p3 = re.search(r"\-(.*?)\+", lab_curr).group(1)  # type: ignore
+
+            # 無声化母音を通常の母音として扱う
+            if drop_unvoiced_vowels and p3 in "AEIOU":
+                p3 = p3.lower()
+            flag = False
+            # 先頭と末尾の sil のみ例外対応
+            if p3 == "sil":
+                flag = True
+                assert n == 0 or n == N - 1
+                if n == 0:
+                    prosody.append("^")
+                elif n == N - 1:
+                    # 疑問系かどうか
+                    e3 = numeric_feature_by_regex(r"!(\d+)_", lab_curr)
+                    if e3 == 0:
+                        prosody.append("$")
+                    elif e3 == 1:
+                        prosody.append("?")
+                continue
+            elif p3 == "pau":
+                phoneme.append("pau")
+                continue
+            else:
+                phoneme.append(p3)
+
+            # アクセント型および位置情報（前方または後方）
+            a1 = numeric_feature_by_regex(r"/A:([0-9\-]+)\+", lab_curr)
+            a2 = numeric_feature_by_regex(r"\+(\d+)\+", lab_curr)
+            a3 = numeric_feature_by_regex(r"\+(\d+)/", lab_curr)
+            # アクセント句におけるモーラ数
+            f1 = numeric_feature_by_regex(r"/F:(\d+)_", lab_curr)
+
+            a2_next = numeric_feature_by_regex(r"\+(\d+)\+", labels[n + 1])
+
+            # アクセント句境界
+            if a3 == 1 and a2_next == 1:
+                prosody.append("#")
+            # ピッチの立ち下がり（アクセント核）
+            elif a1 == 0 and a2_next == a2 + 1 and a2 != f1:
+                prosody.append("]")
+            # ピッチの立ち上がり
+            elif a2 == 1 and a2_next == 2:
+                prosody.append("[")
+            elif flag:
+                prosody.append('_')
+
+        return phoneme, prosody
