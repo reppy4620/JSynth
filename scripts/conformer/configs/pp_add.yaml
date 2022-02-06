@@ -22,7 +22,7 @@ data:
   data_dir: ../../dataset/pp_add
   valid_size: 100
   tokenizer:
-    mode: paf
+    mode: pp_add
 
 model:
   n_mel: 80
