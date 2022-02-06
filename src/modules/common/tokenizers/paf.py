@@ -65,4 +65,5 @@ class PAFTokenizer(TokenizerBase):
                 a_list += [paf[0][1]]
                 f_list += [paf[0][2]]
         duration = self.extract_duration(label, sr, y_length)
+        assert len(p_list) == len(a_list) == len(f_list)
         return (p_list, a_list, f_list), duration
