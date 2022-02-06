@@ -7,7 +7,8 @@ from .base import TokenizerBase
 
 class PPAddTokenizer(TokenizerBase):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.phoneme_dict = {s: i for i, s in enumerate(['<pad>'] + phonemes)}
         self.prosody_dict = {s: i for i, s in enumerate(['<pad>'] + extra_symbols)}
 
