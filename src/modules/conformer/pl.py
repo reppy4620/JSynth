@@ -4,6 +4,7 @@ from pytorch_lightning import LightningModule
 
 from .model import ConformerModel
 from .dataset import ConformerDataset, collate_fn
+from ..common.schedulers import Scheduler
 from ..utils import add_prefix
 
 
@@ -42,7 +43,8 @@ class ConformerModule(LightningModule):
 
     def configure_optimizers(self):
         opt = optim.AdamW(self.model.parameters(), **self.params.optimizer)
-        return opt
+        scheduler = Scheduler.from_config(self.params.scheduler, self.trainer.current_epoch-1)
+        return opt, scheduler
 
     def setup(self, stage=None):
         self.ds = ConformerDataset(self.params.data)
