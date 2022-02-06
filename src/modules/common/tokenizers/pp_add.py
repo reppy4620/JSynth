@@ -21,7 +21,7 @@ class PPAddTokenizer(TokenizerBase):
         return torch.LongTensor(phoneme), torch.LongTensor(prosody), is_transpose
 
     def __len__(self):
-        return num_vocab()
+        return len(self.phoneme_dict)
 
     def extract(self, label_path, sr, y_length):
         label = hts.load(label_path)
