@@ -9,6 +9,9 @@ preprocess:
   orig_sr: 48000
   new_sr: 24000
 
+preprocessor: normal
+tokenizer: paf
+
 train:
   batch_size: 16
   num_epochs: 1000

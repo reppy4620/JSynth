@@ -1,3 +1,5 @@
+from abc import ABC
+
 import torch.optim as optim
 from torch.utils.data import Subset, DataLoader
 from pytorch_lightning import LightningModule
@@ -39,11 +41,6 @@ class ConformerModule(LightningModule):
             prog_bar=True,
             logger=True
         )
-
-    def on_validation_epoch_end(self):
-        super(ConformerModule, self).on_validation_epoch_end()
-        if (self.current_epoch + 1) % self.params.train.save_interval == 0:
-            self.save
 
     def configure_optimizers(self):
         opt = optim.AdamW(self.model.parameters(), **self.params.optimizer)

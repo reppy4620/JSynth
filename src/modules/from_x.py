@@ -1,18 +1,29 @@
 from omegaconf import OmegaConf
 
-from .conformer import ConformerModule, validate as ae_val
-from .common.preprocessors import NormalPreProcessor
+from .conformer import ConformerModule, validate as cfm_val
+from .common.preprocessors import (
+    NormalPreProcessor
+)
+from .common.tokenizers import (
+    TTSLearnTokenizer,
+    PAFTokenizer
+)
 
 modules = {
     'conformer': ConformerModule
 }
 
 val_fn = {
-    'conformer': ae_val
+    'conformer': cfm_val
 }
 
 preprocessors = {
-    'conformer': NormalPreProcessor
+    'normal': NormalPreProcessor
+}
+
+tokenizers = {
+    'ttslearn': TTSLearnTokenizer,
+    'paf': PAFTokenizer
 }
 
 
@@ -28,5 +39,10 @@ def validate_from_args(args):
 
 
 def preprocessor_from_config(config):
-    preprocessor = preprocessors[config.name](config.preprocess)
+    preprocessor = preprocessors[config.preprocessor](config.preprocess)
     return preprocessor
+
+
+def tokenizer_from_config(config):
+    tokenizer = tokenizers[config.tokenizer]()
+    return tokenizer

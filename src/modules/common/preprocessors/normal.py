@@ -6,11 +6,10 @@ import pyworld as pw
 import soundfile as sf
 import torch
 from tqdm import tqdm
-from ttslearn.tacotron.frontend.openjtalk import pp_symbols, extra_symbols
-from nnmnkwii.io import hts
 
 from .base import PreProcessorBase
 from ..transforms import MelSpectrogramWithEnergy
+from ...from_x import tokenizer_from_config
 
 ORIG_SR = None
 NEW_SR = None
@@ -26,6 +25,8 @@ class NormalPreProcessor(PreProcessorBase):
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.to_mel = MelSpectrogramWithEnergy(params=None)
+
+        self.tokenizer = tokenizer_from_config(config)
 
         global ORIG_SR, NEW_SR
         ORIG_SR = config.orig_sr
@@ -49,40 +50,6 @@ class NormalPreProcessor(PreProcessorBase):
         return wav
 
     @staticmethod
-    def refine_duration(phoneme, duration, y_length):
-        duration = np.array(duration)
-        duration_floor = np.floor(duration)
-        diff_rest = y_length - np.sum(duration_floor)
-        indices = np.argsort(np.abs(duration - duration_floor))
-        for idx in indices:
-            duration_floor[idx] += 1
-            diff_rest -= 1
-            if diff_rest == 0:
-                break
-        final_duration = list()
-        i = 0
-        for p in phoneme.split():
-            if p != '_' and p in extra_symbols:
-                final_duration.append(0)
-            else:
-                final_duration.append(duration_floor[i])
-                i += 1
-        assert len(phoneme.split()) == len(final_duration)
-        return final_duration
-
-    def load_phoneme(self, label_path):
-        label = hts.load(label_path)
-        return ' '.join(pp_symbols(label.contexts))
-
-    def load_duration(self, label_path):
-        label = hts.load(label_path)
-        duration = list()
-        for b, e, _ in label[1:-1]:
-            d = (e - b) * 1e-7 * NEW_SR / 256
-            duration += [d]
-        return duration
-
-    @staticmethod
     def extract_feats(wav):
         f0, sp, ap = pw.wav2world(wav, NEW_SR, 1024, 256 / NEW_SR * 1000)
         return f0, sp, ap
@@ -98,9 +65,7 @@ class NormalPreProcessor(PreProcessorBase):
             mel, energy = self.to_mel(wav)
             mel, energy = mel.squeeze(), energy.squeeze()
             pitch = pitch[:mel.size(-1)]
-            phoneme = self.load_phoneme(label_paths[i])
-            duration = self.load_duration(label_paths[i])
-            duration = self.refine_duration(phoneme, duration, mel.size(-1))
+            label, duration = self.tokenizer.extract(label_paths[i], NEW_SR, mel.size(-1))
 
             assert sum(duration) == mel.size(-1), f'{sum(duration)}, {mel.size(-1)}'
 
@@ -116,7 +81,7 @@ class NormalPreProcessor(PreProcessorBase):
             if i == 0:
                 print(wav.size())
                 print(mel.size())
-                print(phoneme)
+                print(label)
                 print(duration)
                 print(pitch.shape)
                 print(energy.shape)
@@ -124,7 +89,7 @@ class NormalPreProcessor(PreProcessorBase):
             torch.save([
                 wav,
                 mel,
-                phoneme,
+                label,
                 torch.LongTensor(duration).view(1, -1),
                 torch.FloatTensor(pitch).view(1, -1),
                 torch.FloatTensor(energy).view(1, -1)
