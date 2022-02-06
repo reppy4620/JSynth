@@ -29,7 +29,8 @@ model:
 
   embedding:
     mode: pp_add
-    n_phoneme: 52
+    n_phoneme: 45
+    n_prosody: 8
 
   encoder:
     channels: 192
