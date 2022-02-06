@@ -6,7 +6,8 @@ from .base import TokenizerBase
 
 
 class TTSLearnTokenizer(TokenizerBase):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.extra_symbol_set = set(extra_symbols)
 
     def tokenize(self, text):

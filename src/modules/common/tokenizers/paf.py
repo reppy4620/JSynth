@@ -9,7 +9,8 @@ from .phonemes import phonemes
 
 class PAFTokenizer(TokenizerBase):
 
-    def __init__(self, state_size=1, **kwargs):
+    def __init__(self, state_size=1, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.state_size = state_size
 
         self.p_dict = self.load_dictionary()

@@ -8,6 +8,7 @@ from .base import TokenizerBase
 class PPAddTokenizer(TokenizerBase):
 
     def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.phoneme_dict = {s: i for i, s in enumerate(['<pad>'] + phonemes)}
         self.prosody_dict = {s: i for i, s in enumerate(['<pad>'] + extra_symbols)}
 
@@ -28,13 +29,16 @@ class PPAddTokenizer(TokenizerBase):
         for p in pp:
             if p in phonemes:
                 phoneme.append(p)
+                prosody.append('_')
             elif p in extra_symbols:
                 if p == '_':
                     phoneme.append('pau')
+                    prosody.append('_')
                 else:
                     prosody.append(p)
             else:
                 raise ValueError('p is invalid value')
+        assert len(phoneme) == len(prosody)
 
         duration = self.extract_duration(label, sr, y_length)
         return (phoneme, prosody), duration
