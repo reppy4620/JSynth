@@ -27,8 +27,9 @@ class ConformerModel(ModelBase):
         self.out_conv = nn.Conv1d(params.decoder.channels, params.n_mel, 1)
         self.post_net = PostNet(params.n_mel)
 
-    def forward(self, x, x_length):
-        x = self.emb(x)
+    def forward(self, inputs):
+        *labels, x_length = inputs
+        x = self.emb(*labels)
         x, pos_emb = self.relative_pos_emb(x)
 
         x_mask = sequence_mask(x_length).unsqueeze(1).to(x.dtype)
@@ -46,8 +47,7 @@ class ConformerModel(ModelBase):
 
     def compute_loss(self, batch):
         (
-            x,
-            extra_mask,
+            *labels,
             x_length,
             y,
             y_length,
@@ -55,7 +55,7 @@ class ConformerModel(ModelBase):
             pitch,
             energy
         ) = batch
-        x = self.emb(x)
+        x = self.emb(*labels)
         x, pos_emb = self.relative_pos_emb(x)
 
         x_mask = sequence_mask(x_length).unsqueeze(1).to(x.dtype)
