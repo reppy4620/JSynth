@@ -1,1 +1,1 @@
-python ../../src/preprocess.py -c ./config.yaml
+python ../../src/preprocess.py -c $1

@@ -1,1 +1,1 @@
-python ../../src/train.py -c ./config.yaml
+python ../../src/train.py -c $1
