@@ -7,5 +7,5 @@ class Scheduler:
     }
 
     @classmethod
-    def from_config(cls, config, last_epoch):
-        return cls._d[config.mode](**config, last_epoch=last_epoch)
+    def from_config(cls, optimizer, config, last_epoch):
+        return cls._d[config.mode](optimizer, **config, last_epoch=last_epoch)
