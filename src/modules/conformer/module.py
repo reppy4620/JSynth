@@ -23,7 +23,7 @@ class ConformerModule(ModuleBase):
         loss_dict = add_prefix(loss_dict, 'train')
         return loss_dict
 
-    def validation_step(self, batch, batch_idx):
+    def validating_step(self, batch, batch_idx):
         loss_dict = self.model.compute_loss(batch)
         loss_dict = add_prefix(loss_dict, 'valid')
         if batch_idx == 0:
