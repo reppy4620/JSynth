@@ -1,13 +1,5 @@
-from pathlib import Path
 from argparse import ArgumentParser
-from omegaconf import OmegaConf
-from pytorch_lightning import seed_everything
 from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.loggers import CSVLogger, TensorBoardLogger
-
-from modules import PLModule
-from callbacks import IntervalCheckpoint
 
 from modules.conformer.trainer import Trainer
 

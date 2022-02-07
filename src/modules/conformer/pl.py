@@ -4,12 +4,12 @@ from torch.utils.data import Subset, DataLoader
 from pytorch_lightning import LightningModule
 
 from .model import ConformerModel
-from .dataset import ConformerDataset, collate_fn
+from ..common.datasets import TTSDataset
 from ..common.schedulers import Scheduler
 from ..utils import add_prefix
 
 
-class ConformerModule(LightningModule):
+class ConformerModule:
     def __init__(self, params):
         super(ConformerModule, self).__init__()
         self.params = params
@@ -65,25 +65,23 @@ class ConformerModule(LightningModule):
         scheduler = Scheduler.from_config(opt, self.params.scheduler, self.trainer.current_epoch-1)
         return [opt], [scheduler]
 
-    def setup(self, stage=None):
-        self.ds = ConformerDataset(self.params.data)
-
-    def train_dataloader(self):
-        train_ds = Subset(self.ds, list(range(self.params.data.valid_size, len(self.ds))))
-        return DataLoader(
+    def configure_dataloader(self):
+        Dataset, collate_fn = TTSDataset.from_config(self.params.data)
+        ds = Dataset(self.params.data)
+        train_ds = Subset(ds, list(range(self.params.data.valid_size, len(ds))))
+        valid_ds = Subset(ds, list(range(self.params.data.valid_size)))
+        train_loader = DataLoader(
             train_ds,
             batch_size=self.params.train.batch_size,
             shuffle=True,
             num_workers=8,
             collate_fn=collate_fn
         )
-
-    def val_dataloader(self):
-        valid_ds = Subset(self.ds, list(range(self.params.data.valid_size)))
-        return DataLoader(
+        valid_loader = DataLoader(
             valid_ds,
             batch_size=self.params.train.batch_size,
             shuffle=False,
             num_workers=8,
             collate_fn=collate_fn
         )
+        return train_loader, valid_loader
