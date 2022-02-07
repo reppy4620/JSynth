@@ -8,7 +8,6 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from src.modules.common.utils import Tracker
-from src.modules.common.schedulers.noam import NoamLR
 from src.modules.pl_module import ConformerModule
 
 
@@ -39,17 +38,17 @@ class NormalTrainer:
         module = ConformerModule(config)
         train_loader, valid_loader = module.configure_dataloaders()
 
-        epochs = 0
+        epochs = 1
         if self.resume_checkpoint:
             epochs = self.load(config, module)
 
-        optimizer, scheduler = module.configure_optimizers(epochs=epochs)
+        optimizer, scheduler = module.configure_optimizers(epochs=epochs-1)
 
         module, optimizer, train_loader, valid_loader = accelerator.prepare(
             module, optimizer, train_loader, valid_loader
         )
 
-        for epoch in range(epochs+1, config.train.num_epochs+1):
+        for epoch in range(epochs, config.train.num_epochs+1):
             self.train_step(epoch, module, optimizer, scheduler, train_loader, writer, accelerator)
             accelerator.wait_for_everyone()
             if accelerator.is_main_process:
