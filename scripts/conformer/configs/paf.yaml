@@ -15,7 +15,7 @@ preprocess:
 
 train:
   batch_size: 16
-  fp_16: false
+  fp_16: true
   num_epochs: 1000
   monitor: valid/recon
   save_interval: 100
