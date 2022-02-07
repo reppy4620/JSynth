@@ -20,27 +20,12 @@ class ConformerModule(ModuleBase):
 
     def training_step(self, batch, batch_idx):
         loss_dict = self.model.compute_loss(batch)
-        loss = loss_dict['loss']
         loss_dict = add_prefix(loss_dict, 'train')
-        self.log_dict(
-            loss_dict,
-            on_step=False,
-            on_epoch=True,
-            prog_bar=True,
-            logger=True
-        )
-        return loss
+        return loss_dict
 
     def validation_step(self, batch, batch_idx):
         loss_dict = self.model.compute_loss(batch)
         loss_dict = add_prefix(loss_dict, 'valid')
-        self.log_dict(
-            loss_dict,
-            on_step=False,
-            on_epoch=True,
-            logger=True
-        )
-
         if batch_idx == 0:
             (
                 *labels,
@@ -59,11 +44,13 @@ class ConformerModule(ModuleBase):
             plt.imshow(y[0].squeeze().detach().cpu().numpy(), aspect='auto', origin='lower')
             plt.savefig(f'{self.params.output_dir}/latest.png')
             plt.close()
+        return loss_dict
 
     def configure_optimizers(self, epochs):
         opt = optim.AdamW(self.model.parameters(), eps=1e-9, **self.params.optimizer)
         scheduler = Scheduler.from_config(opt, self.params.scheduler, epochs-1)
-        return [opt], [scheduler]
+        self.optimizer = opt
+        return opt, scheduler
 
     def configure_dataloaders(self):
         Dataset, collate_fn = TTSDataset.from_config(self.params.data)
