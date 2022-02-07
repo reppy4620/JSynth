@@ -9,7 +9,7 @@ from pytorch_lightning import seed_everything
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from .pl import ConformerModule
+from .module import ConformerModule
 from .utils import Tracker
 from ..common.schedulers.noam import NoamLR
 
@@ -36,9 +36,7 @@ class Trainer:
             writer = None
 
         module = ConformerModule(config)
-        module.setup()
-        train_loader = module.train_dataloader()
-        valid_loader = module.val_dataloader()
+        train_loader, valid_loader = module.configure_dataloaders()
 
         model = module.model
         optimizer = optim.AdamW(model.parameters(), eps=1e-9, **config.optimizer)

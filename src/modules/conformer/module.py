@@ -1,15 +1,15 @@
 import matplotlib.pyplot as plt
 import torch.optim as optim
 from torch.utils.data import Subset, DataLoader
-from pytorch_lightning import LightningModule
 
 from .model import ConformerModel
+from ..common.model import ModuleBase
 from ..common.datasets import TTSDataset
 from ..common.schedulers import Scheduler
 from ..utils import add_prefix
 
 
-class ConformerModule:
+class ConformerModule(ModuleBase):
     def __init__(self, params):
         super(ConformerModule, self).__init__()
         self.params = params
@@ -60,12 +60,12 @@ class ConformerModule:
             plt.savefig(f'{self.params.output_dir}/latest.png')
             plt.close()
 
-    def configure_optimizers(self):
+    def configure_optimizers(self, epochs):
         opt = optim.AdamW(self.model.parameters(), eps=1e-9, **self.params.optimizer)
-        scheduler = Scheduler.from_config(opt, self.params.scheduler, self.trainer.current_epoch-1)
+        scheduler = Scheduler.from_config(opt, self.params.scheduler, epochs-1)
         return [opt], [scheduler]
 
-    def configure_dataloader(self):
+    def configure_dataloaders(self):
         Dataset, collate_fn = TTSDataset.from_config(self.params.data)
         ds = Dataset(self.params.data)
         train_ds = Subset(ds, list(range(self.params.data.valid_size, len(ds))))

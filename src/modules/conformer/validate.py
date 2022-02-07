@@ -7,7 +7,7 @@ import soundfile as sf
 import torch
 from tqdm import tqdm
 
-from .pl import ConformerModule
+from .module import ConformerModule
 
 
 def validate(args, config):
