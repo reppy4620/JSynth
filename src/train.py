@@ -50,7 +50,6 @@ def main():
         callbacks=[best_cp, interval_cp],
         gpus=1,
         max_epochs=config.train.num_epochs,
-        log_every_n_steps=10,
         gradient_clip_val=5.0,
         resume_from_checkpoint=last_ckpt_path if last_ckpt_path.exists() else None
     )
