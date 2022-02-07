@@ -43,7 +43,6 @@ class ConformerModel(ModelBase):
         x = self.out_conv(x)
         x *= y_mask
         x_post = self.post_net(x, y_mask)
-        x_post *= y_mask
         x = x + x_post
         return x
 
@@ -81,7 +80,6 @@ class ConformerModel(ModelBase):
         x = self.out_conv(x)
         x *= y_mask
         x_post = self.post_net(x, y_mask)
-        x_post *= y_mask
         x = x + x_post
 
         assert x.size() == y.size() and \
