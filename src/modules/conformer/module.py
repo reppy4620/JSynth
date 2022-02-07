@@ -20,12 +20,10 @@ class ConformerModule(ModuleBase):
 
     def training_step(self, batch, batch_idx):
         loss_dict = self.model.compute_loss(batch)
-        loss_dict = add_prefix(loss_dict, 'train')
         return loss_dict
 
     def validating_step(self, batch, batch_idx):
         loss_dict = self.model.compute_loss(batch)
-        loss_dict = add_prefix(loss_dict, 'valid')
         if batch_idx == 0:
             (
                 *labels,
