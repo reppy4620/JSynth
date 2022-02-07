@@ -39,16 +39,17 @@ class NormalTrainer:
         module = ConformerModule(config)
         train_loader, valid_loader = module.configure_dataloaders()
 
-        epochs = self.load(config, module)
+        epochs = 0
+        if self.resume_checkpoint:
+            epochs = self.load(config, module)
 
         optimizer, scheduler = module.configure_optimizers(epochs=epochs)
 
         module, optimizer, train_loader, valid_loader = accelerator.prepare(
             module, optimizer, train_loader, valid_loader
         )
-        scheduler = NoamLR(optimizer, **config.scheduler, last_epoch=epochs * len(train_loader) - 1)
 
-        for epoch in range(epochs, config.train.num_epochs):
+        for epoch in range(epochs+1, config.train.num_epochs+1):
             self.train_step(epoch, module, optimizer, scheduler, train_loader, writer, accelerator)
             accelerator.wait_for_everyone()
             if accelerator.is_main_process:
