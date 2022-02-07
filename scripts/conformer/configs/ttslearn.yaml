@@ -13,6 +13,7 @@ preprocess:
   new_sr: 24000
 
 train:
+  mode: all
   batch_size: 16
   num_epochs: 1000
   monitor: valid/recon

@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pad_sequence
 from ..tokenizers import Tokenizer
 
 
-class NormalDataset(Dataset):
+class AllDataset(Dataset):
     def __init__(self, params):
         super().__init__()
         self.data = list(sorted(Path(params.data_dir).glob('*.pt')))

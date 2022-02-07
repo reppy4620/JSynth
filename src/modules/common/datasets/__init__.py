@@ -1,9 +1,9 @@
-from .normal import NormalDataset, collate_fn as normal_collate
+from .all import AllDataset, collate_fn as all_collate
 
 
 class TTSDataset:
     _d = {
-        'normal': (NormalDataset, normal_collate)
+        'all': (AllDataset, all_collate)
     }
 
     @classmethod
