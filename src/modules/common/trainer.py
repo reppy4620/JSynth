@@ -7,8 +7,8 @@ from pytorch_lightning import seed_everything
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from src.modules.common.utils import Tracker
-from src.modules.pl_module import ConformerModule
+from .utils import Tracker
+from ..pl_module import PLModule
 
 
 class Trainer:
@@ -35,7 +35,7 @@ class Trainer:
         else:
             writer = None
 
-        module = ConformerModule(config)
+        module = PLModule.from_config(config)
         train_loader, valid_loader = module.configure_dataloaders()
 
         epochs = 1
