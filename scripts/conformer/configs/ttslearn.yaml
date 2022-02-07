@@ -1,6 +1,6 @@
 name: conformer
 seed: 42
-output_dir: ./out
+output_dir: ./out/ttslearn
 
 preprocess:
   mode: normal

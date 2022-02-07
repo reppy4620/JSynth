@@ -1,6 +1,6 @@
 name: conformer
 seed: 42
-output_dir: ./out
+output_dir: ./out/pp_add
 
 preprocess:
   mode: normal
