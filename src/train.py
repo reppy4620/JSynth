@@ -51,6 +51,7 @@ def main():
         gpus=1,
         max_epochs=config.train.num_epochs,
         gradient_clip_val=5.0,
+        precision=config.train.precision,
         resume_from_checkpoint=last_ckpt_path if last_ckpt_path.exists() else None
     )
     module.trainer = trainer
