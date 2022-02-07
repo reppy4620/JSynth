@@ -85,7 +85,7 @@ class Trainer:
         tracker = Tracker()
         with torch.no_grad():
             for i, batch in enumerate(loader):
-                loss_dict = module.validate_step(batch, i)
+                loss_dict = module.validation_step(batch, i)
                 loss_dict = {k: l.item() for k, l in loss_dict.items()}
                 tracker.update(**loss_dict)
         self.write_losses(epoch, writer, tracker, mode='valid')
