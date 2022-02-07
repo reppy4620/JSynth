@@ -21,7 +21,7 @@ class Trainer:
     def run(self):
         config = self.config
 
-        accelerator = Accelerator(fp16=False)
+        accelerator = Accelerator(fp16=config.train.fp_16)
 
         seed_everything(config.seed)
 
