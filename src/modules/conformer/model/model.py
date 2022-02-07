@@ -82,7 +82,7 @@ class ConformerModel(ModelBase):
                dur_pred.size() == duration.size() and \
                pitch_pred.size() == pitch.size() and \
                energy.size() == energy.size()
-        recon_loss = F.l1_loss(x, y)
+        recon_loss = F.mse_loss(x, y)
         duration_loss = F.mse_loss(dur_pred, duration)
         pitch_loss = F.mse_loss(pitch_pred, pitch)
         energy_loss = F.mse_loss(energy_pred, energy)
