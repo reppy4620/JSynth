@@ -11,15 +11,15 @@ from src.modules.common.utils import Tracker
 from src.modules.pl_module import ConformerModule
 
 
-class NormalTrainer:
+class Trainer:
     def __init__(self,
-                 config_path,
+                 config,
                  resume_checkpoint=None):
-        self.config_path = config_path
+        self.config = config
         self.resume_checkpoint = resume_checkpoint
 
     def run(self):
-        config = OmegaConf.load(self.config_path)
+        config = self.config
 
         accelerator = Accelerator(fp16=False)
 
@@ -53,12 +53,11 @@ class NormalTrainer:
             accelerator.wait_for_everyone()
             if accelerator.is_main_process:
                 self.valid_step(epoch, module, valid_loader, writer)
-                if (epoch + 1) % config.train.save_interval == 0:
-                    self.save(
-                        output_dir / 'latest.ckpt',
-                        epoch,
-                        accelerator.unwrap_model(module)
-                    )
+                self.save(
+                    output_dir / 'last.ckpt',
+                    epoch,
+                    accelerator.unwrap_model(module)
+                )
         if accelerator.is_main_process:
             writer.close()
 
