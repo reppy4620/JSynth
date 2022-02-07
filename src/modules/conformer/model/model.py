@@ -82,10 +82,6 @@ class ConformerModel(ModelBase):
         x_post = self.post_net(x, y_mask)
         x = x + x_post
 
-        assert x.size() == y.size() and \
-               dur_pred.size() == duration.size() and \
-               pitch_pred.size() == pitch.size() and \
-               energy.size() == energy.size()
         recon_loss = F.mse_loss(x, y)
         recon_post_loss = F.mse_loss(x, y)
         duration_loss = F.mse_loss(dur_pred, duration)
