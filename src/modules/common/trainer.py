@@ -38,11 +38,11 @@ class Trainer:
         module = PLModule.from_config(config)
         train_loader, valid_loader = module.configure_dataloaders()
 
-        epochs = 1
+        epochs = 0
         if self.resume_checkpoint:
             epochs = self.load(config, module)
 
-        optimizer, scheduler = module.configure_optimizers(epochs=epochs-1)
+        optimizer, scheduler = module.configure_optimizers(epochs=epochs)
 
         module, optimizer, train_loader, valid_loader = accelerator.prepare(
             module, optimizer, train_loader, valid_loader
