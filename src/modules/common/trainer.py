@@ -67,7 +67,6 @@ class Trainer:
         bar = tqdm(desc=f'Epoch: {epoch + 1}', total=len(loader), disable=not accelerator.is_main_process)
         for i, batch in enumerate(loader):
             loss_dict = module.training_step(batch, i)
-            print(loss_dict)
             optimizer.zero_grad()
             accelerator.backward(loss_dict['loss'])
             accelerator.clip_grad_norm_(module.parameters(), 5)
