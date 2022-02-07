@@ -22,7 +22,7 @@ train:
 
 data:
   mode: all
-  data_dir: ../../dataset/paf
+  data_dir: ../../../jsynth/dataset/paf
   valid_size: 100
   tokenizer:
     mode: paf
