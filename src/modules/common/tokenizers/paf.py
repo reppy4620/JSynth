@@ -29,18 +29,6 @@ class PAFTokenizer(TokenizerBase):
         is_transpose = [0, 0, 0]
         return p_id, a_id, f_id, is_transpose
 
-        # p_id = [self.p_dict[s] for s in p]
-        #
-        # a_id = [a[i + 1] if i == 0 and a1 == 'xx' else a[i - 1] if a1 == 'xx' else a1 for i, a1 in enumerate(a)]
-        # a_id = [int(a1) / 15 for a1 in a_id]
-        #
-        # f_id = [self.f_dict[x] for x in f]
-        #
-        # p_id = torch.LongTensor(p_id)
-        # a_id = torch.FloatTensor(a_id)
-        # f_id = torch.LongTensor(f_id)
-        # return p_id, a_id, f_id, [0, 0, 0]
-
     @staticmethod
     def load_dictionary():
         dictionary = dict()
