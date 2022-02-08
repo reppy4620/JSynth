@@ -31,7 +31,6 @@ model:
   embedding:
     mode: ttslearn
     n_phoneme: 45
-    n_prosody: 8
     channels: 192
 
   encoder:
