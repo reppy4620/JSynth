@@ -12,9 +12,8 @@ class TTSLearnTokenizer(TokenizerBase):
 
     def tokenize(self, text):
         inp = text_to_sequence(text)
-        is_extra = [s in self.extra_symbol_set for s in text]
-        is_transpose = [0, 1]
-        return torch.LongTensor(inp), torch.FloatTensor(is_extra).transpose(-1, -2), is_transpose
+        is_transpose = [0]
+        return torch.LongTensor(inp), is_transpose
 
     def __len__(self):
         return num_vocab()
