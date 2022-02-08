@@ -44,7 +44,7 @@ class ConformerModel(ModelBase):
         x = self.out_conv(x)
         x *= y_mask
         x_post = self.post_net(x, y_mask)
-        x += x_post
+        x = x + x_post
         return x
 
     def compute_loss(self, batch):
@@ -81,7 +81,7 @@ class ConformerModel(ModelBase):
         x = self.out_conv(x)
         x *= y_mask
         x_post = self.post_net(x, y_mask)
-        x += x_post
+        x = x + x_post
 
         recon_loss = F.mse_loss(x, y)
         recon_post_loss = F.mse_loss(x_post, y)
