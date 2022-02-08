@@ -4,10 +4,10 @@ import torch
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
 
-from ..common.tokenizers import Tokenizer
+from ..tokenizers import Tokenizer
 
 
-class ConformerDataset(Dataset):
+class AllDataset(Dataset):
     def __init__(self, params):
         super().__init__()
         self.data = list(sorted(Path(params.data_dir).glob('*.pt')))

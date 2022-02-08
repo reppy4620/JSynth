@@ -4,7 +4,7 @@ from torch.utils.data import Subset, DataLoader
 from pytorch_lightning import LightningModule
 
 from .model import ConformerModel
-from .dataset import ConformerDataset, collate_fn
+from ..common.datasets import Dataset
 from ..common.schedulers import Scheduler
 from ..utils import add_prefix
 
@@ -66,7 +66,7 @@ class ConformerModule(LightningModule):
         return [opt], [scheduler]
 
     def setup(self, stage=None):
-        self.ds = ConformerDataset(self.params.data)
+        self.ds, self.collate_fn = Dataset.from_config(self.params.data)
 
     def train_dataloader(self):
         train_ds = Subset(self.ds, list(range(self.params.data.valid_size, len(self.ds))))
@@ -75,7 +75,7 @@ class ConformerModule(LightningModule):
             batch_size=self.params.train.batch_size,
             shuffle=True,
             num_workers=8,
-            collate_fn=collate_fn
+            collate_fn=self.collate_fn
         )
 
     def val_dataloader(self):
@@ -85,5 +85,5 @@ class ConformerModule(LightningModule):
             batch_size=self.params.train.batch_size,
             shuffle=False,
             num_workers=8,
-            collate_fn=collate_fn
+            collate_fn=self.collate_fn
         )

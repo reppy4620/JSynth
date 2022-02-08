@@ -4,8 +4,8 @@ from abc import abstractmethod
 
 class TokenizerBase:
 
-    def __init__(self, *args, **kwargs):
-        pass
+    def __init__(self, config):
+        self.config = config
 
     def __call__(self, *args, **kwargs):
         return self.tokenize(*args, **kwargs)

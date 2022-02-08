@@ -12,4 +12,4 @@ class Tokenizer:
 
     @classmethod
     def from_config(cls, config):
-        return cls._d[config.mode](**config)
+        return cls._d[config.mode](config)

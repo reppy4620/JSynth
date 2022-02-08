@@ -24,6 +24,7 @@ data:
   valid_size: 100
   tokenizer:
     mode: paf
+    state_size: 1
 
 model:
   n_mel: 80
