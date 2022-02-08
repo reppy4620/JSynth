@@ -7,4 +7,4 @@ class IntervalCheckpoint(Callback):
 
     def on_epoch_end(self, trainer, pl_module):
         if (trainer.current_epoch + 1) % self.interval == 0:
-            trainer.save_checkpoint(f'epoch_{trainer.current_epoch}.ckpt')
+            trainer.save_checkpoint(f'{pl_module.params.output_dir}/epoch_{trainer.current_epoch}.ckpt')
