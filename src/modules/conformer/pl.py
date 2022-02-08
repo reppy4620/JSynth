@@ -6,7 +6,7 @@ from pytorch_lightning import LightningModule
 from .model import ConformerModel
 from ..common.datasets import Dataset
 from ..common.schedulers import Scheduler
-from ..utils import add_prefix
+from ..common.utils import add_prefix
 
 
 class ConformerModule(LightningModule):

@@ -1,4 +1,4 @@
-from .conformer import ConformerModule
+from ..conformer import ConformerModule
 
 
 class PLModule:
