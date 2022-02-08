@@ -1,1 +1,1 @@
-from .layers import EmbeddingLayer
+from .embedding import EmbeddingLayer
