@@ -20,6 +20,7 @@ train:
   save_interval: 100
 
 data:
+  mode: all
   data_dir: ../../dataset/ttslearn
   valid_size: 100
   tokenizer:
