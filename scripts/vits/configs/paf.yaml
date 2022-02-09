@@ -1,0 +1,88 @@
+name: grad_tts
+seed: 42
+mode: paf
+output_dir: ./out/${mode}
+
+preprocess:
+  mode: normal
+  tokenizer:
+    mode: ${mode}
+  wav_dir: /disk/fs1/Corpus/JSUT/jsut_ver1.1/basic5000/wav
+  label_dir: /disk/fs1/Corpus/JSUT/jsut-label/labels/basic5000
+  output_dir: ../../dataset/${mode}
+  orig_sr: 48000
+  new_sr: 24000
+
+train:
+  batch_size: 16
+  precision: 32
+  num_epochs: 1000
+  monitor: valid/prior
+  save_interval: 500
+
+data:
+  mode: normal
+  data_dir: ../../dataset/${mode}
+  valid_size: 100
+  tokenizer:
+    mode: ${mode}
+    state_size: 1
+
+model:
+  n_mel: 80
+  channels: 192
+
+  embedding:
+    mode: ${mode}
+    n_p: 38
+    n_a: 28
+    n_f: 19
+    channels: 64
+
+  encoder:
+    hidden_channels: ${model.channels}
+    filter_channels: ${model.channels}
+    n_heads: 2
+    n_layers: 6
+    kernel_size: 3
+    p_dropout: 0.1
+
+  generator:
+    inter_channels: ${model.channels}
+    resblock: "1"
+    resblock_kernel_sizes: [3, 7, 11]
+    resblock_dilation_sizes: [[1,3,5], [1,3,5], [1,3,5]]
+    upsample_rates: [8,8,2,2]
+    upsample_initial_channel: 512
+    upsample_kernel_sizes: 512
+
+  pos_encoder:
+    spec_channels: 513
+    inter_channels: ${model.channels}
+    hidden_channels: ${model.channels}
+    kernel_size: 5
+    dilation_rate: 1
+    n_layers: 16
+
+  flow:
+    channels: ${model.channels}
+    hidden_channels: ${model.channels}
+    kernel_size: 5
+    dilation_rate: 1
+    n_layers: 4
+
+  dp:
+    in_channels: ${model.channels}
+    filter_channels: ${model.channels}
+    kernel_size: 3
+    p_dropout: 0.5
+
+optimizer:
+  lr: 1.0
+  betas: [0.9, 0.98]
+
+scheduler:
+  mode: noam
+  warmup_steps: 4000
+  channels: ${model.channels}
+
