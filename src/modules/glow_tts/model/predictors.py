@@ -52,7 +52,7 @@ class VariancePredictor(nn.Module):
             nn.Sequential(
                 nn.Conv1d(in_channels if i == 0 else channels, channels, kernel_size, padding=kernel_size // 2),
                 nn.ReLU(),
-                LayerNorm(in_channels if i == 0 else channels),
+                LayerNorm(channels),
                 nn.Dropout(dropout)
             ) for i in range(n_layers)
         ])
