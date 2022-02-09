@@ -21,7 +21,7 @@ train:
   save_interval: 500
 
 data:
-  mode: all
+  mode: normal
   data_dir: ../../dataset/${mode}
   valid_size: 100
   tokenizer:
