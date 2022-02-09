@@ -9,7 +9,7 @@ from .loss import mle_loss, duration_loss
 from ..monotonic_align import maximum_path
 from ...common.model.layers.embedding import EmbeddingLayer, RelPositionalEncoding
 from ...common.model.layers.transformer import Transformer
-from src.modules.common.utils import sequence_mask
+from ...common.utils import sequence_mask
 
 
 class GlowTTSModel(nn.Module):
