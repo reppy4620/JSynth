@@ -1,4 +1,4 @@
-name: conformer
+name: glow_tts
 seed: 42
 mode: pp_add
 output_dir: ./out/${mode}
