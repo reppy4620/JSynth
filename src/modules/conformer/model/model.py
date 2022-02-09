@@ -6,11 +6,11 @@ from ...common.model import ModelBase
 from ...common.model.layers import EmbeddingLayer
 
 from ...common.model.layers import RelPositionalEncoding
+from ...common.model.layers.transformer import Transformer
+from ...common.utils import sequence_mask, generate_path
 from .layers import PostNet
 from .conformer import Conformer
-from src.modules.common.model.layers.transformer import Transformer
 from .predictors import VarianceAdopter
-from ...common.utils import sequence_mask, generate_path
 
 
 class ConformerModel(ModelBase):
