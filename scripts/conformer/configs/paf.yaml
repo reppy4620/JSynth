@@ -1,14 +1,15 @@
 name: conformer
 seed: 42
-output_dir: ./out/paf
+mode: paf
+output_dir: ./out/${mode}
 
 preprocess:
   mode: normal
   tokenizer:
-    mode: paf
+    mode: ${mode}
   wav_dir: /disk/fs1/Corpus/JSUT/jsut_ver1.1/basic5000/wav
   label_dir: /disk/fs1/Corpus/JSUT/jsut-label/labels/basic5000
-  output_dir: ../../dataset/paf
+  output_dir: ../../dataset/${mode}
   orig_sr: 48000
   new_sr: 24000
 
@@ -21,35 +22,36 @@ train:
 
 data:
   mode: all
-  data_dir: ../../dataset/paf
+  data_dir: ../../dataset/${mode}
   valid_size: 100
   tokenizer:
-    mode: paf
+    mode: ${mode}
     state_size: 1
 
 model:
   n_mel: 80
+  channels: 192
 
   embedding:
-    mode: paf
+    mode: ${mode}
     n_p: 38
     n_a: 28
     n_f: 19
     channels: 64
 
   encoder:
-    channels: 192
+    channels: ${model.channels}
     n_heads: 2
     n_layers: 6
     dropout: 0.1
 
   variance_adopter:
-    in_channels: 192
+    in_channels: ${model.channels}
     channels: 256
     dropout: 0.1
 
   decoder:
-    channels: 192
+    channels: ${model.channels}
     n_heads: 2
     n_layers: 6
     dropout: 0.1
@@ -61,5 +63,5 @@ optimizer:
 scheduler:
   mode: noam
   warmup_steps: 4000
-  channels: 192
+  channels: ${model.channels}
 

@@ -1,14 +1,15 @@
 name: conformer
 seed: 42
-output_dir: ./out/ttslearn
+mode: ttslearn
+output_dir: ./out/${mode}
 
 preprocess:
   mode: normal
   tokenizer:
-    mode: ttslearn
+    mode: ${mode}
   wav_dir: /disk/fs1/Corpus/JSUT/jsut_ver1.1/basic5000/wav
   label_dir: /disk/fs1/Corpus/JSUT/jsut-label/labels/basic5000
-  output_dir: ../../dataset/ttslearn
+  output_dir: ../../dataset/${mode}
   orig_sr: 48000
   new_sr: 24000
 
@@ -21,32 +22,33 @@ train:
 
 data:
   mode: all
-  data_dir: ../../dataset/ttslearn
+  data_dir: ../../dataset/${mode}
   valid_size: 100
   tokenizer:
-    mode: ttslearn
+    mode: ${mode}
 
 model:
   n_mel: 80
+  channels: 192
 
   embedding:
-    mode: ttslearn
+    mode: ${mode}
     n_phoneme: 52
-    channels: 192
+    channels: ${model.channels}
 
   encoder:
-    channels: 192
+    channels: ${model.channels}
     n_heads: 2
     n_layers: 6
     dropout: 0.1
 
   variance_adopter:
-    in_channels: 192
+    in_channels: ${model.channels}
     channels: 256
     dropout: 0.1
 
   decoder:
-    channels: 192
+    channels: ${model.channels}
     n_heads: 2
     n_layers: 6
     dropout: 0.1
@@ -58,5 +60,5 @@ optimizer:
 scheduler:
   mode: noam
   warmup_steps: 4000
-  channels: 192
+  channels: ${model.channels}
 
