@@ -76,7 +76,7 @@ class GlowTTSModel(nn.Module):
             logp = logp1 + logp2 + logp3 + logp4
             path = maximum_path(logp, attn_mask.squeeze(1)).unsqueeze(1).detach()
 
-        z_mu, z_logs, dur_pred = self.variance_adopter(x_mu, x_logs, x_length, x_mask, path.squeeze(1))
+        z_mu, z_logs, dur_pred = self.variance_adopter(x, x_mu, x_logs, x_mask, path.squeeze(1))
 
         z_mu = z_mu[:, :, :z.size(-1)]
         z_logs = z_logs[:, :, :z.size(-1)]
