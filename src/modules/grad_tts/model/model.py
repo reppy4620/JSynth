@@ -78,7 +78,7 @@ class GradTTSModel(nn.Module):
             duration=duration_loss
         )
 
-    def infer(self, inputs, n_time_steps=10, temperature=1.0, use_solver=False):
+    def forward(self, inputs, n_time_steps=10, temperature=1.0, use_solver=False):
         *labels, x_length = inputs
         x = self.emb(*labels)
 
