@@ -1,7 +1,8 @@
 import torch.nn as nn
 
-from .attention import RelativeSelfAttentionLayer
-from .layers import LayerNorm, FFN, ConvolutionModule
+from ...common.model.layers.attention import RelativeSelfAttentionLayer
+from ...common.model.layers.common import LayerNorm, FFN
+from .layers import ConvolutionModule
 
 
 class ConformerLayer(nn.Module):

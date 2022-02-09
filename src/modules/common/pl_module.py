@@ -1,9 +1,13 @@
 from ..conformer import ConformerModule
+from ..glow_tts import GlowTTSModule
+from ..grad_tts import GradTTSModule
 
 
 class PLModule:
     _d = {
-        'conformer': ConformerModule
+        'conformer': ConformerModule,
+        'glow_tts': GlowTTSModule,
+        'grad_tts': GradTTSModule
     }
 
     @classmethod

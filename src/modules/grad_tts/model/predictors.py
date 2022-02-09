@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from ...common.model.layers.attention import LayerNorm
+from ...common.model.layers.common import LayerNorm
 from ...common.utils import sequence_mask, generate_path
 
 
@@ -16,54 +16,29 @@ class VarianceAdopter(nn.Module):
             dropout=dropout
         )
         self.length_regulator = LengthRegulator()
-        self.pitch_predictor = VariancePredictor(
-            in_channels=in_channels,
-            channels=channels,
-            n_layers=2,
-            kernel_size=3,
-            dropout=dropout
-        )
-        self.energy_predictor = VariancePredictor(
-            in_channels=in_channels,
-            channels=channels,
-            n_layers=2,
-            kernel_size=3,
-            dropout=dropout
-        )
 
     def forward(
         self,
         x,
+        x_mu,
         x_mask,
-        y_mask,
-        pitch,
-        energy,
         path
     ):
         dur_pred = self.duration_predictor(x, x_mask)
-        x = self.length_regulator(x, path)
-        pitch_pred = self.pitch_predictor(x, y_mask)
-        energy_pred = self.energy_predictor(x, y_mask)
+        z_mu = self.length_regulator(x_mu, path)
+        return z_mu, dur_pred
 
-        x += pitch + energy
-        return x, (dur_pred, pitch_pred, energy_pred)
-
-    def infer(self, x, x_mask):
+    def infer(self, x, x_mu, x_mask):
         dur_pred = self.duration_predictor(x, x_mask)
-        dur_pred = torch.round(dur_pred).clamp_min(1) * x_mask
-        y_length = torch.clamp_min(torch.sum(dur_pred, [1, 2]), 1).long()
-        y_mask = sequence_mask(y_length).unsqueeze(1).to(x_mask.device)
+        dur_pred = torch.round(dur_pred) * x_mask
+        y_lengths = torch.clamp_min(torch.sum(dur_pred, [1, 2]), 1).long()
+        y_mask = sequence_mask(y_lengths).unsqueeze(1).to(x_mask.device)
         attn_mask = torch.unsqueeze(x_mask, -1) * torch.unsqueeze(y_mask, 2)
 
         path = generate_path(dur_pred.squeeze(1), attn_mask.squeeze(1))
 
-        x = self.length_regulator(x, path)
-
-        pitch = self.pitch_predictor(x, y_mask)
-        energy = self.energy_predictor(x, y_mask)
-
-        x += pitch + energy
-        return x, y_mask
+        z_mu = self.length_regulator(x_mu, path)
+        return z_mu, y_mask
 
 
 class VariancePredictor(nn.Module):

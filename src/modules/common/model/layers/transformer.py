@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 from .attention import RelativeSelfAttentionLayer
-from .layers import FFN
+from .common import FFN
 
 
 class TransformerLayer(nn.Module):

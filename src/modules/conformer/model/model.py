@@ -5,11 +5,12 @@ import torch.nn.functional as F
 from ...common.model import ModelBase
 from ...common.model.layers import EmbeddingLayer
 
-from .layers import RelPositionalEncoding, PostNet
+from ...common.model.layers import RelPositionalEncoding
+from .layers import PostNet
 from .conformer import Conformer
-from .transformer import Transformer
+from src.modules.common.model.layers.transformer import Transformer
 from .predictors import VarianceAdopter
-from .utils import sequence_mask, generate_path
+from ...common.utils import sequence_mask, generate_path
 
 
 class ConformerModel(ModelBase):
