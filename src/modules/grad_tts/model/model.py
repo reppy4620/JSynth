@@ -20,7 +20,7 @@ class GradTTSModel(nn.Module):
         self.segment_length = params.segment_length
         self.adjust_length = 2 ** len(params.decoder.mults)
 
-        self.emb = EmbeddingLayer.from_config(params.embedding)
+        self.emb = EmbeddingLayer(**params.embedding)
         self.relative_pos_emb = RelPositionalEncoding(
             params.encoder.channels,
             params.encoder.dropout
