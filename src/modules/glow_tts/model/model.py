@@ -83,7 +83,7 @@ class GlowTTSModel(nn.Module):
         duration = torch.sum(path, dim=-1)
 
         loss_mle = mle_loss(z, z_mu, z_logs, log_df_dz, z_mask)
-        loss_dur = duration_loss(dur_pred, duration)
+        loss_dur = duration_loss(dur_pred, duration, x_length)
         loss = loss_mle + loss_dur
 
         return dict(
