@@ -15,7 +15,7 @@ preprocess:
 
 train:
   batch_size: 16
-  precision: 16
+  precision: 32
   num_epochs: 1000
   monitor: valid/mle
   save_interval: 500
@@ -31,6 +31,7 @@ data:
 model:
   n_mel: 80
   channels: 192
+  segment_length: 256
 
   embedding:
     mode: ${mode}
