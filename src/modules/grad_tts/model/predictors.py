@@ -24,7 +24,7 @@ class VarianceAdopter(nn.Module):
         x_mask,
         path
     ):
-        dur_pred = self.duration_predictor(x, x_mask)
+        dur_pred = self.duration_predictor(x.detach(), x_mask)
         z_mu = self.length_regulator(x_mu, path)
         return z_mu, dur_pred
 
