@@ -18,7 +18,7 @@ train:
   precision: 16
   num_epochs: 1000
   monitor: valid/mle
-  save_interval: 100
+  save_interval: 500
 
 data:
   mode: all
