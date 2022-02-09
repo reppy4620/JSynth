@@ -16,7 +16,7 @@ class GlowTTSModel(nn.Module):
     def __init__(self, params):
         super(GlowTTSModel, self).__init__()
 
-        self.emb = EmbeddingLayer.from_config(params.embedding)
+        self.emb = EmbeddingLayer(**params.embedding)
         self.relative_pos_emb = RelPositionalEncoding(
             params.encoder.channels,
             params.encoder.dropout
