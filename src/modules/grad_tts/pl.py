@@ -46,10 +46,7 @@ class GradTTSModule(LightningModule):
                 *labels,
                 x_length,
                 y,
-                y_length,
-                duration,
-                pitch,
-                energy
+                y_length
             ) = batch
             o = self.model([*labels, x_length])
             o = o[0][:, :y_length[0]]

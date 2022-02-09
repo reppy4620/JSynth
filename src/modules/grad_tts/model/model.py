@@ -28,7 +28,7 @@ class GradTTSModel(nn.Module):
         self.pre_net = PreNet(params.encoder.channels)
         self.encoder = Transformer(**params.encoder)
         self.proj_mu = nn.Conv1d(params.encoder.channels, params.n_mel, 1)
-        self.variance_adopter = VarianceAdopter(*params.variance_adopter)
+        self.variance_adopter = VarianceAdopter(**params.variance_adopter)
         self.decoder = Diffusion(n_mel=params.n_mel, **params.decoder)
 
     def compute_loss(self, batch):
@@ -58,7 +58,7 @@ class GradTTSModel(nn.Module):
             log_prior = y_square - y_mu_double + mu_square + const
             path = maximum_path(log_prior, attn_mask.squeeze(1)).detach()
 
-        y_mu, dur_pred = self.variance_adopter(x_mu, x_length, x_mask, path.squeeze(1))
+        y_mu, dur_pred = self.variance_adopter(x, x_mu, x_mask, path.squeeze(1))
 
         duration = torch.sum(path.unsqueeze(1), dim=-1) * x_mask
         duration_loss = torch.sum((dur_pred - duration) ** 2) / torch.sum(x_length)
