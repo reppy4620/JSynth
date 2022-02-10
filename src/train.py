@@ -36,12 +36,10 @@ def main():
         save_dir=f'{config.output_dir}',
         name=f'csv_logs',
         flush_logs_every_n_steps=100000,
-        version='1'
     )
     tb_logger = TensorBoardLogger(
         save_dir=f'{config.output_dir}',
         name=f'tb_logs',
-        version='1'
     )
 
     last_ckpt_path = output_dir / 'last.ckpt'
