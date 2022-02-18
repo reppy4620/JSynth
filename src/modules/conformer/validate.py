@@ -62,7 +62,8 @@ def validate(args, config):
         *inputs, _ = tokenizer(inputs)
         length = torch.LongTensor([len(inputs[0])])
 
-        *inputs, length = [x.unsqueeze(0).to(device) for x in [*inputs, length]]
+        inputs = [x.unsqueeze(0).to(device) for x in inputs]
+        length = length.to(device)
 
         with torch.no_grad():
             o = model([*inputs, length])
