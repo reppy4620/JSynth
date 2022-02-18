@@ -52,6 +52,7 @@ def validate(args, config):
 
     for i, p in tqdm(enumerate(data_list), total=len(data_list)):
         d = output_dir / f'res_{i+1:04d}'
+        d.mkdir(exist_ok=True)
         (
             wav,
             mel,
