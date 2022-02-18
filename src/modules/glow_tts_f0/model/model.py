@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from ...conformer.model.predictors import VarianceAdopter
+from .predictors import VarianceAdopter
 from ...glow_tts.model.layers import PreNet
 from ...glow_tts.model.glow import Glow
 from ...glow_tts.model.loss import mle_loss, duration_loss
