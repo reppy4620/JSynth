@@ -2,10 +2,12 @@ from argparse import ArgumentParser
 from omegaconf import OmegaConf
 
 from modules.conformer import validate as cfm_validate
+from modules.glow_tts import validate as glow_tts_validate
 
 
 validate_fn = {
-    'conformer': cfm_validate
+    'conformer': cfm_validate,
+    'glow_tts': glow_tts_validate,
 }
 
 
