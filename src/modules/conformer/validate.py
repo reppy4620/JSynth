@@ -8,6 +8,7 @@ from torchaudio.sox_effects import apply_effects_tensor
 
 from .pl import ConformerModule
 from ..common.tokenizers import Tokenizer
+from ..vocoders.hifi_gan import load_hifi_gan
 
 SR = 24000
 
