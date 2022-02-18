@@ -46,7 +46,7 @@ class GlowTTSWithF0Model(nn.Module):
 
         z = (z_mu + torch.exp(z_logs) * torch.randn_like(z_mu) * noise_scale) * z_mask
 
-        y, *_ = self.decoder.backward(z, z_mask)
+        y, *_ = self.glow.backward(z, z_mask)
         return y
 
     def compute_loss(self, batch):
