@@ -46,7 +46,7 @@ class GradTTSModel(nn.Module):
 
         x = self.pre_net(x, x_mask)
         x = self.encoder(x, pos_emb, x_mask)
-        x_mu = self.proj_mu(x)
+        x_mu = self.proj_mu(x) * y_mask
 
         attn_mask = torch.unsqueeze(x_mask, -1) * torch.unsqueeze(y_mask, 2)
         with torch.no_grad():
@@ -87,7 +87,7 @@ class GradTTSModel(nn.Module):
 
         x = self.pre_net(x, x_mask)
         x = self.encoder(x, pos_emb, x_mask)
-        x_mu = self.proj_mu(x)
+        x_mu = self.proj_mu(x) * x_mask
 
         mu, z_mask = self.variance_adopter.infer(x, x_mu, x_mask)
 

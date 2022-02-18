@@ -36,7 +36,7 @@ class GlowTTSModel(nn.Module):
 
         x = self.pre_net(x, x_mask)
         x = self.encoder(x, pos_emb, x_mask)
-        x_mu = self.proj_mu(x)
+        x_mu = self.proj_mu(x) * x_mask
         x_logs = torch.zeros_like(x_mu)
 
         z_mu, z_logs, z_mask = self.variance_adopter.infer(x, x_mu, x_logs, x_mask)
@@ -61,7 +61,7 @@ class GlowTTSModel(nn.Module):
 
         x = self.pre_net(x, x_mask)
         x = self.encoder(x, pos_emb, x_mask)
-        x_mu = self.proj_mu(x)
+        x_mu = self.proj_mu(x) * x_mask
         x_logs = torch.zeros_like(x_mu)
 
         z, log_df_dz, z_mask = self.decoder(y, z_mask)
