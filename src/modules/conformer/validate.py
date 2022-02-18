@@ -14,7 +14,7 @@ SR = 24000
 
 
 def validate(args, config):
-    output_dir = Path(args.output_dir)
+    output_dir = Path(config.output_dir) / 'validate'
     output_dir.mkdir(exist_ok=True, parents=True)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
