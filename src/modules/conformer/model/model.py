@@ -34,7 +34,6 @@ class ConformerModel(ModelBase):
         x, pos_emb = self.relative_pos_emb(x)
 
         x_mask = sequence_mask(x_length).unsqueeze(1).to(x.dtype)
-        x, pos_emb = self.relative_pos_emb(x)
         x = self.encoder(x, pos_emb, x_mask)
 
         x, y_mask = self.variance_adopter.infer(x, x_mask)
