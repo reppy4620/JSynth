@@ -79,7 +79,7 @@ class GlowTTSWithF0Model(nn.Module):
         )
         x, pos_emb = self.relative_pos_emb(x)
         x = self.decoder(x, pos_emb, z_mask)
-        z_mu = self.proj_mu(x)
+        z_mu = self.proj_mu(x) * z_mask
         z_logs = torch.zeros_like(z_mu)
 
         z, log_df_dz, z_mask = self.glow(y, z_mask)
