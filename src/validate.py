@@ -13,6 +13,7 @@ def main():
     parser = ArgumentParser()
     parser.add_argument('--config', type=str, required=True)
     parser.add_argument('--ckpt_path', type=str, required=True)
+    parser.add_argument('--vocoder_path', type=str)
     parser.add_argument('--output_dir', type=str, required=True)
     args = parser.parse_args()
     config = OmegaConf.load(args.config)

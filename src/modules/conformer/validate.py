@@ -1,27 +1,31 @@
-import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import pyworld as pw
-import soundfile as sf
 import torch
+import torchaudio
 from tqdm import tqdm
+from torchaudio.sox_effects import apply_effects_tensor
 
 from .pl import ConformerModule
+from ..common.tokenizers import Tokenizer
+from ...vocoders.hifi_gan import load_hifi_gan
+
+SR = 24000
 
 
 def validate(args, config):
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True, parents=True)
 
-    img_dir = output_dir / 'img'
-    img_dir.mkdir(parents=True, exist_ok=True)
-    data_dir = output_dir / 'data'
-    data_dir.mkdir(parents=True, exist_ok=True)
-
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = ConformerModule.load_from_checkpoint(args.ckpt_path, params=config)
+    vocoder = load_hifi_gan(args.vocoder_path)
     model = model.eval().to(device)
+
+    data_dir = Path(config.data.data_dir)
+    data_list = list(sorted(data_dir.glob('*.pt')))[:config.data.valid_size]
+
+    tokenizer = Tokenizer.from_config(config.data.tokenizer)
 
     def save_fig(gen, gt, path):
         plt.figure(figsize=(14, 7))
@@ -34,27 +38,36 @@ def validate(args, config):
         plt.savefig(path)
         plt.close()
 
-    def _get_sp(filename, fft_size=1024, frame_period=256 / 24000 * 1000):
-        x, fs = sf.read(filename)
-        _f0, t = pw.dio(x, fs, frame_period=frame_period)
-        f0 = pw.stonemask(x, _f0, t, fs)
-        sp = pw.cheaptrick(x, f0, t, fs, fft_size=fft_size)
-        return sp
+    def save_wav(wav, path):
+        effects = [
+            ['gain', '-n']
+        ]
+        wav, _ = apply_effects_tensor(wav, SR, effects, channels_first=True)
+        torchaudio.save(
+            str(path),
+            wav,
+            SR
+        )
 
-    def get_sp(filename):
-        sp = _get_sp(filename)
-        sp = torch.FloatTensor(sp)
-        sp = torch.log(sp)
-        sp = sp.transpose(-1, -2)
-        sp = sp[:-1, :]
-        return sp
+    for i, p in tqdm(enumerate(data_list), total=len(data_list)):
+        d = output_dir / f'res_{i+1:04d}'
+        (
+            wav,
+            mel,
+            inputs,
+            *_
+        ) = torch.load(p)
+        *inputs, _ = tokenizer(inputs)
+        length = torch.LongTensor([len(inputs[0])])
 
-    wav_path_list = list(sorted(Path(model.params.data.data_dir).glob('*.wav')))[:model.params.data.valid_size * 2]
+        *inputs, length = [x.unsqueeze(0).to(device) for x in [*inputs, length]]
 
-    for i, gt_path in tqdm(enumerate(wav_path_list), total=len(wav_path_list)):
-        fn = gt_path.name
-        gt = get_sp(gt_path)
         with torch.no_grad():
-            gen = model(gt.unsqueeze(0).to(device)).squeeze().detach().cpu().numpy()
+            o = model([*inputs, length])
+            w = vocoder(o)
+            o = o.squeeze(0).detach().cpu()
+            w = w.squeeze(0).detach().cpu()
 
-        save_fig(gen, gt, img_dir / f'sp_{os.path.splitext(fn)[0]}.png')
+        save_wav(wav, d / f'gt.wav')
+        save_wav(w, d / f'gen.wav')
+        save_fig(o, mel, d / f'mel.png')
