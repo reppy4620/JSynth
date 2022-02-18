@@ -21,6 +21,7 @@ def validate(args, config):
     model = ConformerModule.load_from_checkpoint(args.ckpt_path, params=config)
     vocoder = load_hifi_gan(args.vocoder_path)
     model = model.eval().to(device)
+    vocoder = vocoder.eval().to(device)
 
     data_dir = Path(config.data.data_dir)
     data_list = list(sorted(data_dir.glob('*.pt')))[:config.data.valid_size]
