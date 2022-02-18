@@ -7,6 +7,7 @@ from tqdm import tqdm
 from torchaudio.sox_effects import apply_effects_tensor
 
 from .pl import ConformerModule
+from ..common.tokenizers import Tokenizer
 
 SR = 24000
 
