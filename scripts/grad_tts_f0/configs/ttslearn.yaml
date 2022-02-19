@@ -15,9 +15,9 @@ preprocess:
 
 train:
   batch_size: 16
-  precision: 16
+  precision: 32
   num_epochs: 3000
-  monitor: valid/mle
+  monitor: valid/prior
   save_interval: 500
 
 data:
