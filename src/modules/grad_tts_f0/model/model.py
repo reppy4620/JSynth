@@ -16,6 +16,10 @@ class GradTTSWithF0Model(nn.Module):
     def __init__(self, params):
         super(GradTTSWithF0Model, self).__init__()
 
+        self.n_mel = params.n_mel
+        self.segment_length = params.segment_length
+        self.adjust_length = 2 ** len(params.decoder.mults)
+
         self.emb = EmbeddingLayer(**params.embedding)
         self.relative_pos_emb = RelPositionalEncoding(
             params.encoder.channels,

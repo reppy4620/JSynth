@@ -31,6 +31,7 @@ data:
 model:
   n_mel: 80
   channels: 192
+  segment_length: 256
 
   embedding:
     mode: ${mode}
