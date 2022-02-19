@@ -6,7 +6,7 @@ import torchaudio
 from tqdm import tqdm
 from torchaudio.sox_effects import apply_effects_tensor
 
-from .pl import GlowTTSWithF0Module
+from .pl import GradTTSWithF0Module
 from ..common.tokenizers import Tokenizer
 from ..vocoders.hifi_gan import load_hifi_gan
 
@@ -18,7 +18,7 @@ def validate(args, config):
     output_dir.mkdir(exist_ok=True, parents=True)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = GlowTTSWithF0Module.load_from_checkpoint(args.ckpt_path, params=config)
+    model = GradTTSWithF0Module.load_from_checkpoint(args.ckpt_path, params=config)
     vocoder = load_hifi_gan(args.vocoder_path)
     model = model.eval().to(device)
     vocoder = vocoder.eval().to(device)
