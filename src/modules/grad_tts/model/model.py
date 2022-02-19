@@ -58,9 +58,6 @@ class GradTTSModel(nn.Module):
             log_prior = y_square - y_mu_double + mu_square + const
             path = maximum_path(log_prior, attn_mask.squeeze(1)).unsqueeze(1).detach()
 
-        print(x.size(), x_mu.size(), x_mask.size())
-        print(y.size(), path.size())
-
         y_mu, dur_pred = self.variance_adopter(x, x_mu, x_mask, path.squeeze(1))
 
         duration = torch.sum(path, dim=-1) * x_mask
