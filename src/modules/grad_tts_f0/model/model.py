@@ -52,7 +52,7 @@ class GradTTSWithF0Model(nn.Module):
         noise = torch.randn_like(mu) / temperature
         z = mu + noise
         z, mu = self.preprocess(z.size(-1), z, mu)
-        y = self.decoder.reverse_diffusion(z, mu, n_time_steps, use_solver)
+        y = self.diffusion.reverse_diffusion(z, mu, n_time_steps, use_solver)
         return y
 
     def compute_loss(self, batch):
@@ -92,7 +92,7 @@ class GradTTSWithF0Model(nn.Module):
 
         y, y_mu, y_mask = self.rand_slice(y_length, y, y_mu, y_mask)
 
-        diff_loss, _ = self.decoder.compute_loss(y, y_mask, y_mu)
+        diff_loss, _ = self.diffusion.compute_loss(y, y_mask, y_mu)
 
         loss_dur = duration_loss(dur_pred, duration, x_length)
         loss_pitch = duration_loss(pitch_pred, pitch, y_length)
