@@ -14,7 +14,7 @@ preprocess:
   new_sr: 24000
 
 train:
-  batch_size: 32
+  batch_size: 16
   precision: 32
   num_epochs: 3000
   monitor: valid/mle
