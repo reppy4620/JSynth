@@ -97,13 +97,13 @@ class GradTTSWithF0Model(nn.Module):
         loss_dur = duration_loss(dur_pred, duration, x_length)
         loss_pitch = duration_loss(pitch_pred, pitch, y_length)
         loss_energy = duration_loss(energy_pred, energy, y_length)
-        loss = diff_loss + loss_dur + loss_pitch + loss_energy
+        loss = diff_loss + prior_loss + loss_dur + loss_pitch + loss_energy
 
         return dict(
             loss=loss,
             diffusion=diff_loss,
             prior=prior_loss,
-            duration=duration_loss,
+            duration=loss_dur,
             pitch=loss_pitch,
             energy=loss_energy
         )
