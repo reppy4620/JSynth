@@ -1,0 +1,65 @@
+name: grad_tts_f0
+seed: 42
+mode: paf
+output_dir: ./out/${mode}
+
+preprocess:
+  mode: normal
+  tokenizer:
+    mode: ${mode}
+  wav_dir: /disk/fs1/Corpus/JSUT/jsut_ver1.1/basic5000/wav
+  label_dir: /disk/fs1/Corpus/JSUT/jsut-label/labels/basic5000
+  output_dir: ../../dataset/${mode}
+  orig_sr: 48000
+  new_sr: 24000
+
+train:
+  batch_size: 16
+  precision: 16
+  num_epochs: 3000
+  monitor: valid/mle
+  save_interval: 500
+
+data:
+  mode: all
+  data_dir: ../../dataset/${mode}
+  valid_size: 100
+  tokenizer:
+    mode: ${mode}
+    state_size: 1
+
+model:
+  n_mel: 80
+  channels: 192
+
+  embedding:
+    mode: ${mode}
+    n_p: 38
+    n_a: 28
+    n_f: 19
+    channels: 64
+
+  encoder:
+    channels: ${model.channels}
+    n_heads: 2
+    n_layers: 6
+    dropout: 0.1
+
+  variance_adopter:
+    in_channels: ${model.channels}
+    channels: 256
+    dropout: 0.1
+
+  diffusion:
+    channels: 64
+    mults: [1, 2, 4]
+
+optimizer:
+  lr: 1.0
+  betas: [0.9, 0.98]
+
+scheduler:
+  mode: noam
+  warmup_steps: 4000
+  channels: ${model.channels}
+
