@@ -4,7 +4,6 @@ import torch.nn.functional as F
 
 from ...common.model import ModelBase
 from ...common.model.layers import EmbeddingLayer, RelPositionalEncoding
-from ...common.model.layers.transformer import Transformer
 from ...common.utils import sequence_mask, generate_path
 from .layers import PostNet
 from .conformer import Conformer
@@ -21,7 +20,7 @@ class ConformerModel(ModelBase):
             params.encoder.channels,
             params.encoder.dropout
         )
-        self.encoder = Transformer(**params.encoder)
+        self.encoder = Conformer(**params.encoder)
         self.variance_adopter = VarianceAdopter(**params.variance_adopter)
         self.decoder = Conformer(**params.decoder)
 
