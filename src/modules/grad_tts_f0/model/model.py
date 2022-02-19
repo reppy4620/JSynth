@@ -18,7 +18,7 @@ class GradTTSWithF0Model(nn.Module):
 
         self.n_mel = params.n_mel
         self.segment_length = params.segment_length
-        self.adjust_length = 2 ** len(params.decoder.mults)
+        self.adjust_length = 2 ** len(params.diffusion.mults)
 
         self.emb = EmbeddingLayer(**params.embedding)
         self.relative_pos_emb = RelPositionalEncoding(
