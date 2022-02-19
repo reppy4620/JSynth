@@ -46,7 +46,7 @@ class GradTTSModel(nn.Module):
 
         x = self.pre_net(x, x_mask)
         x = self.encoder(x, pos_emb, x_mask)
-        x_mu = self.proj_mu(x) * y_mask
+        x_mu = self.proj_mu(x) * x_mask
 
         attn_mask = torch.unsqueeze(x_mask, -1) * torch.unsqueeze(y_mask, 2)
         with torch.no_grad():
@@ -56,11 +56,14 @@ class GradTTSModel(nn.Module):
             y_mu_double = torch.matmul(2.0 * (factor * x_mu).transpose(1, 2), y)
             mu_square = torch.sum(factor * (x_mu ** 2), 1).unsqueeze(-1)
             log_prior = y_square - y_mu_double + mu_square + const
-            path = maximum_path(log_prior, attn_mask.squeeze(1)).detach()
+            path = maximum_path(log_prior, attn_mask.squeeze(1)).unsqueeze(1).detach()
+
+        print(x.size(), x_mu.size(), x_mask.size())
+        print(y.size(), path.size())
 
         y_mu, dur_pred = self.variance_adopter(x, x_mu, x_mask, path.squeeze(1))
 
-        duration = torch.sum(path.unsqueeze(1), dim=-1) * x_mask
+        duration = torch.sum(path, dim=-1) * x_mask
         duration_loss = torch.sum((dur_pred - duration) ** 2) / torch.sum(x_length)
 
         prior_loss = torch.sum(0.5 * ((y - y_mu) ** 2 + math.log(2 * math.pi)) * y_mask)
