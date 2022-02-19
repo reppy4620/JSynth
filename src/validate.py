@@ -4,12 +4,14 @@ from omegaconf import OmegaConf
 from modules.conformer import validate as cfm_validate
 from modules.glow_tts import validate as glow_tts_validate
 from modules.glow_tts_f0 import validate as glow_tts_f0_validate
+from modules.grad_tts import validate as grad_tts_validate
 
 
 validate_fn = {
     'conformer': cfm_validate,
     'glow_tts': glow_tts_validate,
-    'glow_tts_f0': glow_tts_f0_validate
+    'glow_tts_f0': glow_tts_f0_validate,
+    'grad_tts': grad_tts_validate,
 }
 
 
