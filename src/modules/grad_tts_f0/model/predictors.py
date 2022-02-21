@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from ...common.model.layers.attention import LayerNorm
 from ...common.utils import sequence_mask, generate_path
@@ -40,9 +41,9 @@ class VarianceAdopter(nn.Module):
         energy,
         path
     ):
-        dur_pred = self.duration_predictor(x, x_mask)
+        dur_pred = F.relu(self.duration_predictor(x, x_mask))
         x = self.length_regulator(x, path)
-        pitch_pred = self.pitch_predictor(x, y_mask)
+        pitch_pred = F.relu(self.pitch_predictor(x, y_mask))
         energy_pred = self.energy_predictor(x, y_mask)
 
         x += pitch + energy
