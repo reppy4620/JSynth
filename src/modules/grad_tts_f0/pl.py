@@ -51,7 +51,7 @@ class GradTTSWithF0Module(LightningModule):
                 pitch,
                 energy
             ) = batch
-            o = self.model([*labels, x_length])
+            o = self.model([*labels, x_length], clamp=self.trainer.current_epoch < 100)
             o = o[0][:, :y_length[0]]
             y = y[0][:, :y_length[0]]
             plt.figure(figsize=(8, 6))

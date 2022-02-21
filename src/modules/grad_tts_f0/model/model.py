@@ -32,7 +32,7 @@ class GradTTSWithF0Model(nn.Module):
         self.proj_mu = nn.Conv1d(params.encoder.channels, params.n_mel, 1)
         self.diffusion = Diffusion(n_mel=params.n_mel, **params.diffusion)
 
-    def forward(self, inputs, n_time_steps=100, temperature=1.0,  use_solver=False):
+    def forward(self, inputs, n_time_steps=100, temperature=1.0,  use_solver=False, clamp=False):
         *labels, x_length = inputs
         x = self.emb(*labels)
 
@@ -43,7 +43,8 @@ class GradTTSWithF0Model(nn.Module):
         x = self.encoder(x, pos_emb, x_mask)
         x, y_mask = self.variance_adopter.infer(
             x,
-            x_mask
+            x_mask,
+            clamp
         )
         x, pos_emb = self.relative_pos_emb(x)
         x = self.decoder(x, pos_emb, y_mask)
