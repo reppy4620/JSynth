@@ -52,7 +52,7 @@ class GradTTSWithF0Module(LightningModule):
                 energy
             ) = batch
             o = self.model([*labels, x_length])
-            o = o[0][:, :y_length[0]]
+            o = o[0]
             y = y[0][:, :y_length[0]]
             plt.figure(figsize=(8, 6))
             plt.subplot(2, 1, 1)
