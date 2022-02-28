@@ -97,8 +97,10 @@ class GradTTSModel(nn.Module):
         y = self.decoder.reverse_diffusion(z, mu, n_time_steps, use_solver)
         return y
 
-    def rand_slice(self, length, *args, seg_size=128):
-        min_length = (length - seg_size).clamp_min(0).min()
+    def rand_slice(self, length, *args, seg_size=256):
+        min_length = (length - seg_size).min()
+        if min_length < 0:
+            return (x[..., :min_length] for x in args)
         b = random.randint(0, min_length)
         e = b + seg_size
         return (x[..., b:e] for x in args)
