@@ -14,7 +14,7 @@ SR = 24000
 
 TIME_STEP = 1000
 TEMPERATURE = 1.5
-USE_SOLVER = True
+USE_SOLVER = False
 
 
 def validate(args, config):
