@@ -13,7 +13,7 @@ from ..vocoders.hifi_gan import load_hifi_gan
 SR = 24000
 
 TIME_STEP = 1000
-TEMPERATURE = 1.5
+TEMPERATURE = 1.0
 USE_SOLVER = False
 
 
