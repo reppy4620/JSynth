@@ -4,7 +4,6 @@ import torch
 import torch.nn as nn
 
 from .predictors import VarianceAdopter
-from ...glow_tts.model.loss import duration_loss
 from ...grad_tts.model.layers import PreNet
 from ...grad_tts.model.diffusion import Diffusion
 from ...common.model.layers.embedding import EmbeddingLayer, RelPositionalEncoding
