@@ -24,7 +24,7 @@ class NormalPreProcessor(PreProcessorBase):
         self.output_dir = Path(config.output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        self.to_mel = MelSpectrogramWithEnergy(params=None)
+        self.to_mel = MelSpectrogramWithEnergy()
 
         self.tokenizer = Tokenizer.from_config(config.tokenizer)
 

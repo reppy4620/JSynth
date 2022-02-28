@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 class TransformBase:
 
-    def __init__(self, params):
+    def __init__(self, params=None):
         self.params = params
 
     def __call__(self, *args, **kwargs):

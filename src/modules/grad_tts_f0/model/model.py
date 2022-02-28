@@ -95,9 +95,9 @@ class GradTTSWithF0Model(nn.Module):
 
         diff_loss, _ = self.diffusion.compute_loss(y, y_mask, y_mu)
 
-        loss_dur = duration_loss(dur_pred, duration, x_length)
-        loss_pitch = duration_loss(pitch_pred, pitch, y_length)
-        loss_energy = duration_loss(energy_pred, energy, y_length)
+        loss_dur = torch.sum((dur_pred - duration) ** 2) / torch.sum(x_length)
+        loss_pitch = torch.sum((pitch_pred - pitch) ** 2) / torch.sum(y_length)
+        loss_energy = torch.sum((energy_pred - energy) ** 2) / torch.sum(y_length)
         loss = diff_loss + prior_loss + loss_dur + loss_pitch + loss_energy
 
         return dict(
