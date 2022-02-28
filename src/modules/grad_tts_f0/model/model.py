@@ -111,7 +111,7 @@ class GradTTSWithF0Model(nn.Module):
     def remove_weight_norm(self):
         self.decoder.remove_weight_norm()
 
-    def rand_slice(self, length, *args, seg_size=256):
+    def rand_slice(self, length, *args, seg_size=186):
         min_length = (length - seg_size).min()
         if min_length < 0:
             return (x[..., :min_length] for x in args)
