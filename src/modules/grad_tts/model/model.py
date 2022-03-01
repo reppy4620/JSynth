@@ -98,10 +98,11 @@ class GradTTSModel(nn.Module):
         return y
 
     def rand_slice(self, length, *args, seg_size=256):
-        min_length = (length - seg_size).min()
-        if min_length < 0:
+        _b = (length - seg_size).min()
+        if _b < 0:
+            min_length = (length.min() // self.adjust_length) * self.adjust_length
             return (x[..., :min_length] for x in args)
-        b = random.randint(0, min_length)
+        b = random.randint(0, _b)
         e = b + seg_size
         return (x[..., b:e] for x in args)
 
