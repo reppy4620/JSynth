@@ -209,13 +209,13 @@ def get_noise(t, beta_init, beta_term, cumulative=False):
 
 
 class Diffusion(nn.Module):
-    def __init__(self, n_mel, channels, mults, beta_min=0.05, beta_max=20, pos_emb_type='sinusoid'):
+    def __init__(self, n_mel, channels, mults, beta_min=0.05, beta_max=20):
         super(Diffusion, self).__init__()
         self.n_mel = n_mel
         self.beta_min = beta_min
         self.beta_max = beta_max
 
-        self.estimator = ScoreNet(channels, dim_mults=mults, pos_emb_type=pos_emb_type)
+        self.estimator = ScoreNet(channels, dim_mults=mults)
 
     def forward_diffusion(self, x0, mask, mu, t):
         time = t[:, None, None]
