@@ -162,9 +162,7 @@ class ScoreNet(nn.Module):
         )
 
     def forward(self, x, mask, mu, t):
-
-        t = self.time_pos_emb(t, scale=self.pe_scale)
-        t = self.mlp(t)
+        t = self.time_mlp(t)
 
         x = torch.stack([mu, x], 1)
         mask = mask.unsqueeze(1)
