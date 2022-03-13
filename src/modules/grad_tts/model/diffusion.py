@@ -247,7 +247,7 @@ class Diffusion(nn.Module):
         solver = 'DOP853'
 
         new_length = (shape[-1] // 8) * 8
-        z = z[..., :new_length]
+        xt = xt[..., :new_length]
         mu = mu[..., :new_length]
 
         def score_eval_wrapper(x, time_steps):
