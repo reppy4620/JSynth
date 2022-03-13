@@ -6,7 +6,7 @@ import torch.nn as nn
 from .layers import PreNet
 from .predictors import VarianceAdopter
 from ...common.model.layers.embedding import EmbeddingLayer, RelPositionalEncoding
-from ...common.model.layers.transformer import Transformer
+from ...conformer.model.conformer import Conformer
 from .diffusion import Diffusion
 from ...glow_tts.monotonic_align import maximum_path
 from ...common.utils import sequence_mask
@@ -26,7 +26,7 @@ class GradTTSModel(nn.Module):
             params.encoder.dropout
         )
         self.pre_net = PreNet(params.encoder.channels)
-        self.encoder = Transformer(**params.encoder)
+        self.encoder = Conformer(**params.encoder)
         self.proj_mu = nn.Conv1d(params.encoder.channels, params.n_mel, 1)
         self.variance_adopter = VarianceAdopter(**params.variance_adopter)
         self.decoder = Diffusion(n_mel=params.n_mel, **params.decoder)
@@ -78,7 +78,7 @@ class GradTTSModel(nn.Module):
             duration=duration_loss
         )
 
-    def forward(self, inputs, n_time_steps=100, temperature=1.5, use_solver=False):
+    def forward(self, inputs, temperature=1.0):
         *labels, x_length = inputs
         x = self.emb(*labels)
 
@@ -94,7 +94,7 @@ class GradTTSModel(nn.Module):
         noise = torch.randn_like(mu) / temperature
         z = mu + noise
         z, mu = self.preprocess(z.size(-1), z, mu)
-        y = self.decoder.reverse_diffusion(z, mu, n_time_steps, use_solver)
+        y = self.decoder.reverse_diffusion(z, mu)
         return y
 
     def rand_slice(self, length, *args, seg_size=256):
