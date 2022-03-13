@@ -205,7 +205,6 @@ class ScoreNet(nn.Module):
             x = attn(x)
             x = upsample(x * mask_up)
 
-        x = self.final_block(x, mask)
         output = self.final_conv(x * mask)
 
         return (output * mask).squeeze(1)
