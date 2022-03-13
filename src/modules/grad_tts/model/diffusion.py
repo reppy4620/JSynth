@@ -58,7 +58,7 @@ class ConvNextBlock(nn.Module):
             nn.GELU(),
             torch.nn.Linear(time_emb_dim, dim)
         ) if time_emb_dim is not None else None
-        self.norm = LayerNorm(dim_out) if norm else nn.Identity()
+        self.norm = LayerNorm(dim) if norm else nn.Identity()
         self.conv1 = nn.Conv2d(dim, dim_out * mult, kernel_size=3, padding=1)
         self.act = nn.GELU()
         self.conv2 = nn.Conv2d(dim_out * mult, dim_out, kernel_size=3, padding=1)
