@@ -94,7 +94,7 @@ class GradTTSModel(nn.Module):
         noise = torch.randn_like(mu) / temperature
         z = mu + noise
         z, mu = self.preprocess(z.size(-1), z, mu)
-        y = self.decoder.reverse_diffusion(z, mu)
+        y = self.decoder.reverse_diffusion(z, mu, n_timesteps=100)
         return y
 
     def rand_slice(self, length, *args, seg_size=256):
