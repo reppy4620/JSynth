@@ -15,10 +15,10 @@ preprocess:
 
 train:
   batch_size: 16
-  precision: 16
+  precision: 32
   num_epochs: 5000
   monitor: valid/prior
-  save_interval: 500
+  save_interval: 1000
 
 data:
   mode: normal
