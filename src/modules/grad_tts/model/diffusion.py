@@ -65,7 +65,7 @@ class ConvNextBlock(nn.Module):
 
         self.res_conv = torch.nn.Conv2d(dim, dim_out, 1) if dim != dim_out else nn.Identity()
 
-    def forward(self, x, mask, time_emb):
+    def forward(self, x, mask, time_emb=None):
         h = self.ds_conv(x)
         if self.mlp is not None:
             h += self.mlp(time_emb).unsqueeze(-1).unsqueeze(-1)
@@ -169,10 +169,8 @@ class ScoreNet(nn.Module):
                     Upsample(dim_in)
                 ])
             )
-        self.final_conv = nn.Sequential(
-            ConvNextBlock(dim, dim),
-            nn.Conv2d(dim, 1, 1)
-        )
+        self.final_block = ConvNextBlock(dim, dim)
+        self.final_conv = nn.Conv2d(dim, 1, 1)
 
     def forward(self, x, mask, mu, t):
         t = self.time_mlp(t)
@@ -205,6 +203,7 @@ class ScoreNet(nn.Module):
             x = attn(x)
             x = upsample(x * mask_up)
 
+        x = self.final_block(x, mask)
         output = self.final_conv(x * mask)
 
         return (output * mask).squeeze(1)
