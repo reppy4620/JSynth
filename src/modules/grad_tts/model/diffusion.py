@@ -264,8 +264,7 @@ class Diffusion(nn.Module):
             dxt = dxt * noise_t
             return dxt
 
-        t_span = (1., offset)
-        res = solve_ivp(ode_func, t_span, xt.cpu().numpy().reshape(-1).astype(np.float64),
+        res = solve_ivp(ode_func, (1., offset), xt.cpu().numpy().reshape(-1).astype(np.float64),
                         rtol=1e-5, atol=1e-5, method=solver)
         xt = torch.tensor(res.y[:, -1], dtype=torch.float, device=device).view(*shape)
         return xt
