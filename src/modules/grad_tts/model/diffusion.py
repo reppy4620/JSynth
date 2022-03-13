@@ -246,6 +246,10 @@ class Diffusion(nn.Module):
         offset = 1e-5
         solver = 'DOP853'
 
+        new_length = (shape[-1] // 8) * 8
+        z = z[..., :new_length]
+        mu = mu[..., :new_length]
+
         def score_eval_wrapper(x, time_steps):
             x = torch.tensor(x, device=device, dtype=torch.float).view(*shape)
             time_steps = torch.tensor(time_steps, device=device, dtype=torch.float).view(x.size(0))
