@@ -1,24 +1,10 @@
-# Copyright (C) 2021. Huawei Technologies Co., Ltd. All rights reserved.
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the MIT License.
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# MIT License for more details.
-
 import math
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 from scipy.integrate import solve_ivp
 from einops import rearrange
-
-
-class Mish(nn.Module):
-    def forward(self, x):
-        return x * torch.tanh(F.softplus(x))
 
 
 class Upsample(nn.Module):
@@ -39,56 +25,62 @@ class Downsample(nn.Module):
         return self.conv(x)
 
 
-class Rezero(nn.Module):
-    def __init__(self, fn):
-        super(Rezero, self).__init__()
-        self.fn = fn
-        self.g = torch.nn.Parameter(torch.zeros(1))
+class LayerNorm(nn.Module):
+    def __init__(self, channels, eps=1e-5):
+        super().__init__()
+        self.eps = eps
+
+        self.g = nn.Parameter(torch.ones(1, channels, 1, 1))
+        self.b = nn.Parameter(torch.zeros(1, channels, 1, 1))
 
     def forward(self, x):
-        return self.fn(x) * self.g
+        mean = torch.mean(x, dim=1, keepdim=True)
+        var = torch.var(x, dim=1, unbiased=False, keepdim=True)
+        return (x - mean) / (var + self.eps).sqrt() * self.g + self.b
 
 
-class Block(nn.Module):
-    def __init__(self, dim, dim_out, groups=8):
-        super(Block, self).__init__()
-        self.block = torch.nn.Sequential(
-            torch.nn.Conv2d(dim, dim_out, 3, padding=1),
-            torch.nn.GroupNorm(groups, dim_out),
-            Mish()
-        )
+class PreNorm(nn.Module):
+    def __init__(self, dim, fn):
+        super(PreNorm, self).__init__()
+        self.fn = fn
+        self.norm = LayerNorm(dim)
 
-    def forward(self, x, mask):
-        output = self.block(x * mask)
-        return output * mask
+    def forward(self, x):
+        x = self.norm(x)
+        return self.fn(x)
 
 
-class ResnetBlock(nn.Module):
-    def __init__(self, dim, dim_out, time_emb_dim, groups=8):
-        super(ResnetBlock, self).__init__()
+class ConvNextBlock(nn.Module):
+    def __init__(self, dim, dim_out, time_emb_dim=None, mult=2, norm=True):
+        super(ConvNextBlock, self).__init__()
+        self.ds_conv = nn.Conv2d(dim, dim, kernel_size=7, padding=3, groups=dim)
         self.mlp = torch.nn.Sequential(
-            Mish(),
-            torch.nn.Linear(time_emb_dim, dim_out)
-        )
+            nn.GELU(),
+            torch.nn.Linear(time_emb_dim, dim)
+        ) if time_emb_dim is not None else None
+        self.norm = LayerNorm(dim) if norm else nn.Identity()
+        self.conv1 = nn.Conv2d(dim, dim_out * mult, kernel_size=3, padding=1)
+        self.act = nn.GELU()
+        self.conv2 = nn.Conv2d(dim_out * mult, dim_out, kernel_size=3, padding=1)
 
-        self.block1 = Block(dim, dim_out, groups=groups)
-        self.block2 = Block(dim_out, dim_out, groups=groups)
-        if dim != dim_out:
-            self.res_conv = torch.nn.Conv2d(dim, dim_out, 1)
-        else:
-            self.res_conv = torch.nn.Identity()
+        self.res_conv = torch.nn.Conv2d(dim, dim_out, 1) if dim != dim_out else nn.Identity()
 
-    def forward(self, x, mask, time_emb):
-        h = self.block1(x, mask)
-        h += self.mlp(time_emb).unsqueeze(-1).unsqueeze(-1)
-        h = self.block2(h, mask)
-        output = h + self.res_conv(x * mask)
+    def forward(self, x, mask, time_emb=None):
+        h = self.ds_conv(x)
+        if self.mlp is not None:
+            h += self.mlp(time_emb).unsqueeze(-1).unsqueeze(-1)
+        h = self.norm(h * mask)
+        h = self.conv1(h * mask)
+        h = self.act(h)
+        h = self.conv2(h * mask)
+        output = h * mask + self.res_conv(x * mask)
         return output
 
 
 class LinearAttention(nn.Module):
     def __init__(self, dim, heads=4, dim_head=32):
         super(LinearAttention, self).__init__()
+        self.scale = dim_head ** -0.5
         self.heads = heads
         hidden_dim = dim_head * heads
         self.to_qkv = torch.nn.Conv2d(dim, hidden_dim * 3, 1, bias=False)
@@ -98,6 +90,8 @@ class LinearAttention(nn.Module):
         b, c, h, w = x.shape
         qkv = self.to_qkv(x)
         q, k, v = rearrange(qkv, 'b (qkv heads c) h w -> qkv b heads c (h w)', heads=self.heads, qkv=3)
+        q = q * self.scale
+
         k = k.softmax(dim=-1)
         context = torch.einsum('bhdn,bhen->bhde', k, v)
         out = torch.einsum('bhde,bhdn->bhen', context, q)
@@ -116,47 +110,33 @@ class Residual(nn.Module):
 
 
 class SinusoidalPosEmb(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, dim, scale=1000):
         super(SinusoidalPosEmb, self).__init__()
         self.dim = dim
+        self.scale = scale
 
-    def forward(self, x, scale=1000):
+    def forward(self, x):
         device = x.device
         half_dim = self.dim // 2
         emb = math.log(10000) / (half_dim - 1)
         emb = torch.exp(torch.arange(half_dim, device=device).float() * -emb)
-        emb = scale * x.unsqueeze(1) * emb.unsqueeze(0)
+        emb = self.scale * x.unsqueeze(1) * emb.unsqueeze(0)
         emb = torch.cat((emb.sin(), emb.cos()), dim=-1)
         return emb
 
 
-class GaussianFourierProjection(nn.Module):
-    def __init__(self, dim):
-        super().__init__()
-        self.W = nn.Parameter(torch.randn(dim // 2), requires_grad=False)
-
-    def forward(self, x, scale=16.):
-        x_proj = scale * x[:, None] * self.W[None, :] * 2 * np.pi
-        return torch.cat([torch.sin(x_proj), torch.cos(x_proj)], dim=-1)
-
-
 class ScoreNet(nn.Module):
-    def __init__(self, dim, dim_mults=(1, 2, 4), groups=8, pos_emb_type='sinusoid'):
+    def __init__(self, dim, dim_mults=(1, 2, 4)):
         super(ScoreNet, self).__init__()
         self.dim = dim
         self.dim_mults = dim_mults
-        self.groups = groups
 
-        if pos_emb_type == 'sinusoid':
-            self.pe_scale = 1000.
-            self.time_pos_emb = SinusoidalPosEmb(dim)
-        elif pos_emb_type == 'gaussian':
-            self.pe_scale = 16.
-            self.time_pos_emb = GaussianFourierProjection(dim)
-        else:
-            raise ValueError('pos_emb_type must be sinusoid or gaussian.')
-        self.mlp = torch.nn.Sequential(torch.nn.Linear(dim, dim * 4), Mish(),
-                                       torch.nn.Linear(dim * 4, dim))
+        self.time_mlp = nn.Sequential(
+            SinusoidalPosEmb(dim),
+            nn.Linear(dim, dim*4),
+            nn.GELU(),
+            nn.Linear(dim*4, dim)
+        )
 
         dims = [2, *map(lambda m: dim * m, dim_mults)]
         in_out = list(zip(dims[:-1], dims[1:]))
@@ -168,44 +148,42 @@ class ScoreNet(nn.Module):
             is_last = ind >= (num_resolutions - 1)
             self.downs.append(
                 torch.nn.ModuleList([
-                    ResnetBlock(dim_in, dim_out, time_emb_dim=dim),
-                    ResnetBlock(dim_out, dim_out, time_emb_dim=dim),
-                    Residual(Rezero(LinearAttention(dim_out))),
+                    ConvNextBlock(dim_in, dim_out, time_emb_dim=dim, norm=ind!=0),
+                    ConvNextBlock(dim_out, dim_out, time_emb_dim=dim),
+                    Residual(PreNorm(dim_out, LinearAttention(dim_out))),
                     Downsample(dim_out) if not is_last else torch.nn.Identity()
                 ])
             )
 
         mid_dim = dims[-1]
-        self.mid_block1 = ResnetBlock(mid_dim, mid_dim, time_emb_dim=dim)
-        self.mid_attn = Residual(Rezero(LinearAttention(mid_dim)))
-        self.mid_block2 = ResnetBlock(mid_dim, mid_dim, time_emb_dim=dim)
+        self.mid_block1 = ConvNextBlock(mid_dim, mid_dim, time_emb_dim=dim)
+        self.mid_attn = Residual(PreNorm(mid_dim, LinearAttention(mid_dim)))
+        self.mid_block2 = ConvNextBlock(mid_dim, mid_dim, time_emb_dim=dim)
 
         for ind, (dim_in, dim_out) in enumerate(reversed(in_out[1:])):
             self.ups.append(
                 torch.nn.ModuleList([
-                    ResnetBlock(dim_out * 2, dim_in, time_emb_dim=dim),
-                    ResnetBlock(dim_in, dim_in, time_emb_dim=dim),
-                    Residual(Rezero(LinearAttention(dim_in))),
+                    ConvNextBlock(dim_out * 2, dim_in, time_emb_dim=dim),
+                    ConvNextBlock(dim_in, dim_in, time_emb_dim=dim),
+                    Residual(PreNorm(dim_in, LinearAttention(dim_in))),
                     Upsample(dim_in)
                 ])
             )
-        self.final_block = Block(dim, dim)
-        self.final_conv = torch.nn.Conv2d(dim, 1, 1)
+        self.final_block = ConvNextBlock(dim, dim)
+        self.final_conv = nn.Conv2d(dim, 1, 1)
 
     def forward(self, x, mask, mu, t):
-
-        t = self.time_pos_emb(t, scale=self.pe_scale)
-        t = self.mlp(t)
+        t = self.time_mlp(t)
 
         x = torch.stack([mu, x], 1)
         mask = mask.unsqueeze(1)
 
         hiddens = []
         masks = [mask]
-        for resnet1, resnet2, attn, downsample in self.downs:
+        for conv1, conv2, attn, downsample in self.downs:
             mask_down = masks[-1]
-            x = resnet1(x, mask_down, t)
-            x = resnet2(x, mask_down, t)
+            x = conv1(x, mask_down, t)
+            x = conv2(x, mask_down, t)
             x = attn(x)
             hiddens.append(x)
             x = downsample(x * mask_down)
@@ -217,11 +195,11 @@ class ScoreNet(nn.Module):
         x = self.mid_attn(x)
         x = self.mid_block2(x, mask_mid, t)
 
-        for resnet1, resnet2, attn, upsample in self.ups:
+        for conv1, conv2, attn, upsample in self.ups:
             mask_up = masks.pop()
             x = torch.cat((x, hiddens.pop()), dim=1)
-            x = resnet1(x, mask_up, t)
-            x = resnet2(x, mask_up, t)
+            x = conv1(x, mask_up, t)
+            x = conv2(x, mask_up, t)
             x = attn(x)
             x = upsample(x * mask_up)
 
@@ -240,16 +218,16 @@ def get_noise(t, beta_init, beta_term, cumulative=False):
 
 
 class Diffusion(nn.Module):
-    def __init__(self, n_mel, channels, mults, beta_min=0.05, beta_max=20, pos_emb_type='sinusoid'):
+    def __init__(self, n_mel, channels, mults, beta_min=0.05, beta_max=20):
         super(Diffusion, self).__init__()
         self.n_mel = n_mel
         self.beta_min = beta_min
         self.beta_max = beta_max
 
-        self.estimator = ScoreNet(channels, dim_mults=mults, pos_emb_type=pos_emb_type)
+        self.estimator = ScoreNet(channels, dim_mults=mults)
 
     def forward_diffusion(self, x0, mask, mu, t):
-        time = t.unsqueeze(-1).unsqueeze(-1)
+        time = t[:, None, None]
         cum_noise = get_noise(time, self.beta_min, self.beta_max, cumulative=True)
         mean = x0 * torch.exp(-0.5 * cum_noise) + mu * (1.0 - torch.exp(-0.5 * cum_noise))
         variance = 1.0 - torch.exp(-cum_noise)
